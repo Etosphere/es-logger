@@ -4,6 +4,45 @@ A simple logger for CoC.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Introduction
+
+The logger will parse the original log file, and convert into a json log. The json will be like this:
+
+```{json}
+{
+  "id": 0,
+  "type": "block",
+  "roles": ["kp", "dice", "plA", "plB"],
+  "content": [
+    {
+      "id": 1,
+      "type": "action",
+      "role": "plA",
+      "content": "Hello world!"
+    }, {
+      "id": 2,
+      "type": "block",
+      "roles": ["kp", "dice", "plB"],
+      "content": [
+        {
+          "id": 3,
+          "type": "comment",
+          "role": "plB",
+          "content": "(some comment text"
+        }, {
+          "id": 4,
+          "type": "command",
+          "role": "plB",
+          "content": ".sc 1d3"
+        }, {
+          ...
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
