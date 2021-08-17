@@ -12,7 +12,7 @@ The logger will parse the original log file, and convert into a json log. The js
 {
   "id": 0,
   "type": "block",
-  "roles": ["kp", "dice", "plA", "plB"],
+  "role": ["kp", "dice", "plA", "plB"],
   "content": [
     {
       "id": 1,
@@ -22,7 +22,7 @@ The logger will parse the original log file, and convert into a json log. The js
     }, {
       "id": 2,
       "type": "block",
-      "roles": ["kp", "dice", "plB"],
+      "role": ["kp", "dice", "plB"],
       "content": [
         {
           "id": 3,
