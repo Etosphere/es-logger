@@ -43,6 +43,7 @@ class LogParser extends React.Component {
       selectedFile: null,
       parseTreeRoot: null,
       syntaxTreeRoot: null,
+      filteredTreeRoot: null,
       roleFilter: {},   // e.g.: {"role1": {"action": true, "command", false, "comment": false}, ...}
       outputHTML: '',
     };
@@ -254,30 +255,58 @@ class LogParser extends React.Component {
   }
 
   // post-order traversal to delete nodes according to role filter checkboxes
+  // deletion rule:
+  //   1. If none of the reserved roles appear in the Block (except kp and dice), delete the Block (and its children) node.
+  //   2. If is a action / command / comment node and is filtered out according to the checkboxes, delete it.
   filterNodeByRole() {
+    // get all reserved roles from rileFilter
+    let reservedRoleArray = [];
+    Object.keys(this.state.roleFilter).forEach((role) => {
+      let value = this.state.roleFilter[role];
+      if (Object.values(value).includes(true)) {
+        reservedRoleArray.push(role);
+      }
+    });
+    // remove "kp" and "dice" from reserved role array
+    reservedRoleArray = reservedRoleArray.filter(
+      (role) => role !== 'kp' && role !== 'dice');
+
+    let isIntersectionEmpty = (array1, array2) => {
+      return !array1.map((item) => array2.includes(item)).includes(true);
+    };
+
     let filteredTree = _.cloneDeep(this.state.syntaxTreeRoot);
 
     let traverseFilter = (node, parentNode) => {
       if (node) {
         // make a clone to prevent wrong index made by deletion in iteration
-        node.children.slice(0).forEach((child, _) => traverseFilter(child, node));
-        if (node.type === Block && node.children.length === 0 && parentNode) {
-          let toDeleteIndex = parentNode.children.findIndex((child) => child.id === node.id);
-          parentNode.children.splice(toDeleteIndex, 1);
-          node = null;
-        } else if (node.type !== Block) {
+        node.children.slice(0)
+          .forEach((child, _) => traverseFilter(child, node));
+        if (node.type === Block) {
+          if ((node.children.length === 0 && parentNode) ||
+            isIntersectionEmpty(node.role, reservedRoleArray)) {
+            // Block is empty or no reserved roles appear
+            let toDeleteIndex = parentNode.children.findIndex(
+              (child) => child.id === node.id);
+            parentNode.children.splice(toDeleteIndex, 1);
+            node = null;
+          }
+        } else {
           // check for filtering action / command / comment
           let typeName = node.type.toString();
           typeName = typeName.substring(7, typeName.length - 1);
           if (!this.state.roleFilter[node.role][typeName]) {
-            let toDeleteIndex = parentNode.children.findIndex((child) => child.id === node.id);
+            let toDeleteIndex = parentNode.children.findIndex(
+              (child) => child.id === node.id);
             parentNode.children.splice(toDeleteIndex, 1);
             node = null;
           }
         }
       }
-    }
+    };
     traverseFilter(filteredTree, null);
+    this.updateRole(filteredTree);
+    this.setState({filteredTreeRoot: filteredTree});
     this.setState({outputHTML: JSON.stringify(filteredTree, null, 4)});
   }
 
