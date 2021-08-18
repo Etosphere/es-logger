@@ -44,13 +44,13 @@ class LogParser extends React.Component {
       parseTreeRoot: null,
       syntaxTreeRoot: null,
       filteredTreeRoot: null,
-      roleFilter: {},   // e.g.: {"role1": {"action": true, "command", false, "comment": false}, ...}
-      outputHTML: '',
+      roleFilter: {}   // e.g.: {"role1": {"action": true, "command", false, "comment": false}, ...}
     };
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.LogRender = this.LogRender.bind(this);
   }
 
   // syntax:
@@ -237,7 +237,6 @@ class LogParser extends React.Component {
     this.setState({
       parseTreeRoot: parseTree,
       syntaxTreeRoot: syntaxTree,
-      outputHTML: JSON.stringify(syntaxTree, null, 4),
     });
     this.updateRole(this.state.syntaxTreeRoot);
     this.initializeRoleFilter();
@@ -307,7 +306,41 @@ class LogParser extends React.Component {
     traverseFilter(filteredTree, null);
     this.updateRole(filteredTree);
     this.setState({filteredTreeRoot: filteredTree});
-    this.setState({outputHTML: JSON.stringify(filteredTree, null, 4)});
+  }
+
+  LogRender(props) {
+    let children = null;
+    if (props.node && props.node.children !== 0) {
+      children = (
+        <ul style={{"list-style-type": "none", margin: 0}}>
+          {props.node.children.map((i) => (
+            <this.LogRender node={i} key={'log-node-' + i.id} />
+          ))}
+        </ul>
+      );
+      if (props.node.type === Block) {
+        let blockRoles = props.node.role.join(', ');
+        if (props.node.id === 1) {
+          return (<div>{children}</div>);
+        } else {
+          return (
+            <li>
+              <span>[{blockRoles}]</span>
+              {children}
+            </li>
+          );
+        }
+      } else {
+        return (
+          <li>
+            <span>&lt;{props.node.role}&gt;</span> {props.node.content}
+            {children}
+          </li>
+        );
+      }
+    } else {
+      return null;
+    }
   }
 
   render() {
@@ -323,8 +356,7 @@ class LogParser extends React.Component {
                       e.preventDefault();
                       this.filterNodeByRole();
                     }}/>
-        <pre id="output"
-             dangerouslySetInnerHTML={{__html: this.state.outputHTML}}/>
+        <this.LogRender node={this.state.filteredTreeRoot}/>
       </div>
     );
   }
