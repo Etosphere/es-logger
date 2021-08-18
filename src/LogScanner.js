@@ -17,6 +17,7 @@ class LogScanner {
         if (bufferActionContent !== '') {
           this.tokenSequence.push(new Token(tokenID, Action, lastSkipBracketContent, bufferActionContent));
           bufferActionContent = '';
+          tokenID += 1;
         }
         bracketContent = bracketContent[0];
         let skipBracketContent = bracketContent.slice(1,
@@ -39,6 +40,7 @@ class LogScanner {
           } else {
             bufferActionContent += tokenContent;
             lastSkipBracketContent = skipBracketContent;
+            tokenID -= 1;
           }
         }
       } else {
@@ -46,6 +48,7 @@ class LogScanner {
           if (bufferActionContent !== '') {
             this.tokenSequence.push(new Token(tokenID, Action, lastSkipBracketContent, bufferActionContent));
             bufferActionContent = '';
+            tokenID += 1;
           }
           this.tokenSequence.push(
             new Token(tokenID, Comment, lastSkipBracketContent, line));
@@ -58,11 +61,17 @@ class LogScanner {
             new Token(tokenID, Command, lastSkipBracketContent, line));
         } else {
           bufferActionContent += '\n' + line;
+          tokenID -= 1;
         }
       }
       tokenID += 1;
     });
-    this.tokenSequence.push(new Token(tokenID, EOF, null, null));
+    if (bufferActionContent !== '') {
+      // push action token at last line
+      this.tokenSequence.push(new Token(tokenID, Action, lastSkipBracketContent, bufferActionContent));
+      bufferActionContent = '';
+    }
+    this.tokenSequence.push(new Token(tokenID + 1, EOF, null, null));
     return this.tokenSequence;
   }
 }
