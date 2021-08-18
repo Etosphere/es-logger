@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import LogScanner from './LogScanner';
-import RoleFilter from './RoleFilter';
+import LogFilter from './LogFilter';
 import * as Token from './Token';
 
 export const Start = Symbol('Start');
@@ -44,7 +44,7 @@ class LogParser extends React.Component {
       parseTreeRoot: null,
       syntaxTreeRoot: null,
       filteredTreeRoot: null,
-      roleFilter: {}   // e.g.: {"role1": {"action": true, "command", false, "comment": false}, ...}
+      logFilter: {}   // e.g.: {"role": {"plA": true, "plB": false, ...}], "command": true, "comment": true}
     };
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
@@ -173,26 +173,22 @@ class LogParser extends React.Component {
       return buildRootNode.children[buildRootNode.children.length - 1];
     };
 
-    let buildSyntaxTree = (parseTreeNode, syntaxTreeNode) => {
+    let buildFullSyntaxTree = (parseTreeNode, syntaxTreeNode) => {
       if (parseTreeNode) {
         let buildChildNode = buildSyntaxTreeNode(parseTreeNode, syntaxTreeNode);
         if (buildChildNode) {
           parseTreeNode.children.forEach(
-            (child, _) => buildSyntaxTree(child, buildChildNode));
+            (child, _) => buildFullSyntaxTree(child, buildChildNode));
         } else {
           parseTreeNode.children.forEach(
-            (child, _) => buildSyntaxTree(child, syntaxTreeNode));
+            (child, _) => buildFullSyntaxTree(child, syntaxTreeNode));
         }
       }
     };
 
     let syntaxTreeRoot = new SyntaxTreeNode(0, Block, [], null);  // global block containing all roles
-    buildSyntaxTree(rootNode, syntaxTreeRoot);
-    if (syntaxTreeRoot.children !== []) {
-      return syntaxTreeRoot.children[0];
-    } else {
-      return syntaxTreeRoot;
-    }
+    buildFullSyntaxTree(rootNode, syntaxTreeRoot);
+    return syntaxTreeRoot;
   }
 
   // traverse syntax tree in post order to update "role" in Block nodes
@@ -210,16 +206,15 @@ class LogParser extends React.Component {
     }
   };
 
-  initializeRoleFilter() {
-    let tempRoleFilter = {};
-    this.state.syntaxTreeRoot.role.forEach((role) => {
-      tempRoleFilter[role] = {
-        'action': true,
-        'command': true,
-        'comment': true,
-      };
-    });
-    this.setState({roleFilter: tempRoleFilter});
+  initializeLogFilter() {
+    let roleDict = {}
+    this.state.syntaxTreeRoot.role.forEach((role) => roleDict[role] = true);
+    let tempLogFilter = {
+      'role': roleDict,
+      'command': true,
+      'comment': true,
+    };
+    this.setState({logFilter: tempLogFilter});
   }
 
   handleFileChange(event) {
@@ -239,7 +234,7 @@ class LogParser extends React.Component {
       syntaxTreeRoot: syntaxTree,
     });
     this.updateRole(this.state.syntaxTreeRoot);
-    this.initializeRoleFilter();
+    this.initializeLogFilter();
   }
 
   handleFileUpload(event) {
@@ -249,8 +244,8 @@ class LogParser extends React.Component {
     fileReader.readAsText(this.state.selectedFile);
   }
 
-  handleCheckboxChange(newRoleFilter) {
-    this.setState({roleFilter: newRoleFilter});
+  handleCheckboxChange(newLogFilter) {
+    this.setState({logFilter: newLogFilter});
   }
 
   // post-order traversal to delete nodes according to role filter checkboxes
@@ -260,15 +255,13 @@ class LogParser extends React.Component {
   filterNodeByRole() {
     // get all reserved roles from rileFilter
     let reservedRoleArray = [];
-    Object.keys(this.state.roleFilter).forEach((role) => {
-      let value = this.state.roleFilter[role];
-      if (Object.values(value).includes(true)) {
+
+    Object.keys(this.state.logFilter.role).forEach((role) => {
+      // remove "kp" and "dice" from reserved role array
+      if (role !== 'kp' && role !== 'dice' && this.state.logFilter.role[role]) {
         reservedRoleArray.push(role);
       }
     });
-    // remove "kp" and "dice" from reserved role array
-    reservedRoleArray = reservedRoleArray.filter(
-      (role) => role !== 'kp' && role !== 'dice');
 
     let isIntersectionEmpty = (array1, array2) => {
       return !array1.map((item) => array2.includes(item)).includes(true);
@@ -291,10 +284,9 @@ class LogParser extends React.Component {
             node = null;
           }
         } else {
-          // check for filtering action / command / comment
-          let typeName = node.type.toString();
-          typeName = typeName.substring(7, typeName.length - 1);
-          if (!this.state.roleFilter[node.role][typeName]) {
+          // check for filtering command / comment
+          if ((node.type === Command && (!this.state.logFilter.command)) ||
+            (node.type === Comment && (!this.state.logFilter.comment))) {
             let toDeleteIndex = parentNode.children.findIndex(
               (child) => child.id === node.id);
             parentNode.children.splice(toDeleteIndex, 1);
@@ -312,7 +304,7 @@ class LogParser extends React.Component {
     let children = null;
     if (props.node && props.node.children !== 0) {
       children = (
-        <ul style={{"list-style-type": "none", margin: 0}}>
+        <ul style={{listStyleType: "none", margin: 0}}>
           {props.node.children.map((i) => (
             <this.LogRender node={i} key={'log-node-' + i.id} />
           ))}
@@ -320,7 +312,8 @@ class LogParser extends React.Component {
       );
       if (props.node.type === Block) {
         let blockRoles = props.node.role.join(', ');
-        if (props.node.id === 1) {
+        if (props.node.id === 0) {
+          // not render the root Block node
           return (<div>{children}</div>);
         } else {
           return (
@@ -350,7 +343,7 @@ class LogParser extends React.Component {
           <input type="file" onChange={this.handleFileChange}/>
           <input type="button" value="Upload" onClick={this.handleFileUpload}/>
         </div>
-        <RoleFilter roleFilter={this.state.roleFilter}
+        <LogFilter logFilter={this.state.logFilter}
                     onChange={this.handleCheckboxChange}
                     onSubmit={(e) => {
                       e.preventDefault();
