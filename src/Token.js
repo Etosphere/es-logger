@@ -6,10 +6,10 @@ export const Comment = Symbol('comment');
 export const EOF = Symbol('eof');
 
 export default class Token {
-  constructor(id, tokenType, role, content) {
+  constructor(id, tokenType, roleID, content) {
     this.id = id;
     this.type = tokenType;
-    this.role = role;
+    this.roleID = roleID;
     this.content = content;
   }
 }

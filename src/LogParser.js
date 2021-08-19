@@ -44,7 +44,8 @@ class LogParser extends React.Component {
       parseTreeRoot: null,
       syntaxTreeRoot: null,
       filteredTreeRoot: null,
-      logFilter: {}   // e.g.: {"role": {"plA": true, "plB": false, ...}], "command": true, "comment": true}
+      roleTable: null,
+      logFilter: {},   // e.g.: {"role": {0: true, 1: false, ...}], "command": true, "comment": true}
     };
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
@@ -163,7 +164,7 @@ class LogParser extends React.Component {
       } else if (originNode.type === Action || originNode.type === Command ||
         originNode.type === Comment) {
         buildRootNode.addChild(
-          new SyntaxTreeNode(nodeID, originNode.type, originNode.content.role,
+          new SyntaxTreeNode(nodeID, originNode.type, originNode.content.roleID,
             originNode.content.content));
       } else {
         // do nothing
@@ -207,7 +208,7 @@ class LogParser extends React.Component {
   };
 
   initializeLogFilter() {
-    let roleDict = {}
+    let roleDict = {};
     this.state.syntaxTreeRoot.role.forEach((role) => roleDict[role] = true);
     let tempLogFilter = {
       'role': roleDict,
@@ -232,6 +233,7 @@ class LogParser extends React.Component {
     this.setState({
       parseTreeRoot: parseTree,
       syntaxTreeRoot: syntaxTree,
+      roleTable: logScanner.roleTable,
     });
     this.updateRole(this.state.syntaxTreeRoot);
     this.initializeLogFilter();
@@ -255,13 +257,13 @@ class LogParser extends React.Component {
   filterNodeByRole() {
     // get all reserved roles from rileFilter
     let reservedRoleArray = [];
-
     Object.keys(this.state.logFilter.role).forEach((role) => {
-      // remove "kp" and "dice" from reserved role array
+      // TODO: remove "kp" and "dice" from reserved role array
       if (role !== 'kp' && role !== 'dice' && this.state.logFilter.role[role]) {
         reservedRoleArray.push(role);
       }
     });
+    reservedRoleArray = reservedRoleArray.map((roleID) => parseInt(roleID));
 
     let isIntersectionEmpty = (array1, array2) => {
       return !array1.map((item) => array2.includes(item)).includes(true);
@@ -272,8 +274,8 @@ class LogParser extends React.Component {
     let traverseFilter = (node, parentNode) => {
       if (node) {
         // make a clone to prevent wrong index made by deletion in iteration
-        node.children.slice(0)
-          .forEach((child, _) => traverseFilter(child, node));
+        node.children.slice(0).
+          forEach((child, _) => traverseFilter(child, node));
         if (node.type === Block) {
           if ((node.children.length === 0 && parentNode) ||
             isIntersectionEmpty(node.role, reservedRoleArray)) {
@@ -304,14 +306,14 @@ class LogParser extends React.Component {
     let children = null;
     if (props.node && props.node.children !== 0) {
       children = (
-        <ul style={{listStyleType: "none", margin: 0}}>
+        <ul style={{listStyleType: 'none', margin: 0}}>
           {props.node.children.map((i) => (
-            <this.LogRender node={i} key={'log-node-' + i.id} />
+            <this.LogRender node={i} key={'log-node-' + i.id} roleTable={props.roleTable}/>
           ))}
         </ul>
       );
       if (props.node.type === Block) {
-        let blockRoles = props.node.role.join(', ');
+        let blockRoles = props.node.role.map((roleID) => props.roleTable.getName(roleID)).join(', ');
         if (props.node.id === 0) {
           // not render the root Block node
           return (<div>{children}</div>);
@@ -326,7 +328,7 @@ class LogParser extends React.Component {
       } else {
         return (
           <li>
-            <span>&lt;{props.node.role}&gt;</span> {props.node.content}
+            <span>&lt;{props.roleTable.getName(props.node.role)}&gt;</span> {props.node.content}
             {children}
           </li>
         );
@@ -344,12 +346,14 @@ class LogParser extends React.Component {
           <input type="button" value="Upload" onClick={this.handleFileUpload}/>
         </div>
         <LogFilter logFilter={this.state.logFilter}
-                    onChange={this.handleCheckboxChange}
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      this.filterNodeByRole();
-                    }}/>
-        <this.LogRender node={this.state.filteredTreeRoot}/>
+                   roleTable={this.state.roleTable}
+                   onChange={this.handleCheckboxChange}
+                   onSubmit={(e) => {
+                     e.preventDefault();
+                     this.filterNodeByRole();
+                   }}/>
+        <this.LogRender node={this.state.filteredTreeRoot}
+                        roleTable={this.state.roleTable}/>
       </div>
     );
   }

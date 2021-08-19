@@ -25,13 +25,13 @@ class LogFilter extends React.Component {
     if (this.props.logFilter.role) {
       Object.keys(this.props.logFilter.role).forEach((role) => {
         filterElement.push(
-          <label id={'label-' + role} key={'key-' + role}>
-            <input type="checkbox" id={'checkbox-' + role}
+          <label id={'label-role-' + role} key={'checkbox-role-' + role}>
+            <input type="checkbox" id={'checkbox-role-' + role}
                    data-role={role} data-node-type="role"
                    checked={this.props.logFilter.role[role]}
                    onChange={this.handleChange}
                    value={this.props.logFilter.role[role]}/>
-            {role}
+            {this.props.roleTable.getName(role)}
           </label>,
         );
       });
