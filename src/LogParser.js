@@ -1,5 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
+import { Button, Input } from '@material-ui/core';
+import { CloudUpload } from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import LogFilter from './LogFilter';
 import * as Token from './Token';
@@ -252,14 +254,14 @@ class LogParser extends React.Component {
 
   // post-order traversal to delete nodes according to role filter checkboxes
   // deletion rule:
-  //   1. If none of the reserved roles appear in the Block (except kp and dice), delete the Block (and its children) node.
+  //   1. If none of the reserved roles appear in the Block (except kp and dicer), delete the Block (and its children) node.
   //   2. If is a action / command / comment node and is filtered out according to the checkboxes, delete it.
   filterNodeByRole() {
     // get all reserved roles from rileFilter
     let reservedRoleArray = [];
     Object.keys(this.state.logFilter.role).forEach((role) => {
-      // TODO: remove "kp" and "dice" from reserved role array
-      if (role !== 'kp' && role !== 'dice' && this.state.logFilter.role[role]) {
+      // TODO: remove "kp" and "dicer" from reserved role array
+      if (role !== 'kp' && role !== 'dicer' && this.state.logFilter.role[role]) {
         reservedRoleArray.push(role);
       }
     });
@@ -302,6 +304,12 @@ class LogParser extends React.Component {
     this.setState({filteredTreeRoot: filteredTree});
   }
 
+  SpecialRoleSelector(props) {
+    return (
+      <></>
+    );
+  }
+
   LogRender(props) {
     let children = null;
     if (props.node && props.node.children !== 0) {
@@ -342,9 +350,17 @@ class LogParser extends React.Component {
     return (
       <div>
         <div>
-          <input type="file" onChange={this.handleFileChange}/>
-          <input type="button" value="Upload" onClick={this.handleFileUpload}/>
+          <Input id="upload-file-button" type="file" onChange={this.handleFileChange}/>
+          <Button
+            variant="contained"
+            color="default"
+            component="span"
+            startIcon={<CloudUpload />}
+            onClick={this.handleFileUpload}>
+            Upload
+          </Button>
         </div>
+        <this.SpecialRoleSelector />
         <LogFilter logFilter={this.state.logFilter}
                    roleTable={this.state.roleTable}
                    onChange={this.handleCheckboxChange}

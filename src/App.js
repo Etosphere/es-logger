@@ -1,3 +1,4 @@
+import '@fontsource/roboto';
 import LogParser from './LogParser';
 
 function App() {

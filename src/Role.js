@@ -2,7 +2,7 @@ class Role {
   constructor(id, name, type) {
     this.id = id;
     this.name = name;
-    this.type = type;  // kp, dice, or player
+    this.type = type;  // "kp", "dicer", or "player"
   }
 }
 
@@ -34,6 +34,26 @@ class RoleTable {
     if (id >= 0 && id < this.nextRoleID) {
       this.table[id].type = type;
     }
+  }
+
+  getKpID() {
+    let roleArray = Object.values(this.table);
+    for (let i = 0; i < roleArray.length; i++) {
+      if (roleArray[i].type === 'kp') {
+        return roleArray[i].id;
+      }
+    }
+    return null;
+  }
+
+  getDicerID() {
+    let roleArray = Object.values(this.table);
+    for (let i = 0; i < roleArray.length; i++) {
+      if (roleArray[i].type === 'dicer') {
+        return roleArray[i].id;
+      }
+    }
+    return null;
   }
 
   getRoleIdByName(name) {
