@@ -101,7 +101,7 @@ class RoleConfigurator extends React.Component {
     const classes = this.props.classes;
 
     return ([
-      <Grid container alignItems='center' justify='center'>
+      <Grid container>
         <Grid item xs align='right'>
           <FormControl className={classes.formControl}>
             <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
@@ -177,8 +177,8 @@ class RoleConfigurator extends React.Component {
           </FormControl>
         </Grid>
       </Grid>,
-      <Grid container alignItems='center' justifyContent='center'>
-        <Grid item xs={8} align='center'>
+      <Grid container>
+        <Grid item xs align='center'>
           <List>
             {Object.keys(this.state.roleTable.table).map((roleID) => {
               return (
@@ -205,16 +205,16 @@ class RoleConfigurator extends React.Component {
             })}
           </List>
         </Grid>
-        <Grid container alignItems='center' justifyContent='center'>
-          <Grid item xs align='center'>
-            <Button
-              variant="contained"
-              color="secondary"
-              endIcon={<Check/>}
-              onClick={this.handleClick}>
-              Apply
-            </Button>
-          </Grid>
+      </Grid>,
+      <Grid container>
+        <Grid item xs align='center'>
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<Check/>}
+            onClick={this.handleClick}>
+            Apply
+          </Button>
         </Grid>
       </Grid>
     ]);

@@ -351,7 +351,7 @@ class LogParser extends React.Component {
 
   render() {
     return ([
-      <Grid container spacing={1} alignItems='center' justifyContent='center' direction='column'>
+      <Grid container spacing={1} direction='column'>
         <Grid item xs align='center'>
           <input
             hidden
@@ -383,7 +383,7 @@ class LogParser extends React.Component {
           </Button>
         </Grid>}
       </Grid>,
-      <Grid container alignItems='center' justifyContent='center'>
+      <Grid container>
         {this.state.roleTable &&
         <RoleConfigurator roleTable={this.state.roleTable}
                           onSubmit={this.handleRoleTableChange}/>

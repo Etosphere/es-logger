@@ -20,6 +20,10 @@ const theme = createTheme({
           textAlign: 'center'
         }
       }
+    },
+    Grid: {
+      alignItems: 'center',
+      justifyContent: 'center'
     }
   },
 });
