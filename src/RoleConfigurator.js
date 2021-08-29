@@ -9,10 +9,11 @@ import {
   Checkbox,
   Chip,
   TextField,
-  CircularProgress,
   Button,
-  withStyles
+  IconButton,
+  withStyles, List, ListItem, ListItemIcon
 } from "@material-ui/core";
+import {Check, Palette} from "@material-ui/icons";
 
 const styles = (theme) => ({
   formControl: {
@@ -25,7 +26,8 @@ const styles = (theme) => ({
     flexWrap: "wrap"
   },
   chip: {
-    margin: 2
+    marginLeft: 2,
+    marginRight: 2,
   },
   noLabel: {
     marginTop: theme.spacing(3)
@@ -49,126 +51,157 @@ class RoleConfigurator extends React.Component {
     this.state = {
       kpList: [],
       dicerList: [],
+      roleTable: this.props.roleTable,
     }
 
     this.handleKpChange = this.handleKpChange.bind(this);
     this.handleDicerChange = this.handleDicerChange.bind(this);
-    // this.handleChange = this.handleChange.bind(this);
+    this.handleRoleNameChange = this.handleRoleNameChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   handleKpChange(event) {
+    let tempRoleTable = this.state.roleTable;
+    this.state.kpList.forEach((role) => {
+      tempRoleTable.setType(role, 'kp');
+    });
     this.setState({
-      kpList: event.target.value
-    })
+      kpList: event.target.value,
+      roleTable: tempRoleTable
+    });
   }
 
   handleDicerChange(event) {
+    let tempRoleTable = this.state.roleTable;
+    this.state.dicerList.forEach((role) => {
+      tempRoleTable.setType(role, 'dicer');
+    });
     this.setState({
-      dicerList: event.target.value
-    })
+      dicerList: event.target.value,
+      roleTable: tempRoleTable
+    });
   }
 
-  // handleChange(event) {
-  //   let role = event.target.attributes.getNamedItem('data-role').value;
-  //   let nodeType = event.target.attributes.getNamedItem('data-node-type').value;
-  //   let tempLogFilter = this.props.logFilter;
-  //   if (nodeType === 'role') {
-  //     tempLogFilter.role[role] = !tempLogFilter.role[role];
-  //   } else if (nodeType === 'command') {
-  //     tempLogFilter.command = !tempLogFilter.command;
-  //   } else if (nodeType === 'comment') {
-  //     tempLogFilter.comment = !tempLogFilter.comment;
-  //   }
-  //   this.props.onChange(tempLogFilter);
-  // }
+  handleRoleNameChange(roleID, newRoleName) {
+    let tempRoleTable = this.state.roleTable;
+    tempRoleTable.setName(roleID, newRoleName);
+    this.setState({roleTable: tempRoleTable});
+  }
+
+  handleClick() {
+    this.props.onSubmit(this.state.roleTable);
+  }
 
   render() {
     const classes = this.props.classes;
-    console.log(this.props);
 
-    // const handleChange = (event) => {
-    //   setPersonName(event.target.value);
-    // };
-    if (this.props.roleTable) {
-      return (
-        <div>
-          <FormControl className={classes.formControl}>
-            <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
-            <Select
-              labelId="kp-selection-checkbox-label"
-              id="kp-selection-checkbox"
-              multiple
-              value={this.state.kpList}
-              onChange={this.handleKpChange}
-              input={<Input/>}
-              renderValue={(selected) => (
-                <div className={classes.chips}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={this.props.roleTable.getName(value)} className={classes.chip}/>
-                  ))}
-                </div>
-              )}
-              MenuProps={MenuProps}
-            >
-              {Object.keys(this.props.roleTable.table).map((roleID) => (
-                <MenuItem key={roleID} value={roleID}>
-                  <Checkbox checked={this.state.kpList.indexOf(roleID) > -1}/>
-                  <ListItemText primary={this.props.roleTable.getName(roleID)}/>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <br/>
-          <FormControl className={classes.formControl}>
-            <InputLabel id="dicer-selection-checkbox-label">Select dicer</InputLabel>
-            <Select
-              labelId="dicer-selection-checkbox-label"
-              id="dicer-selection-checkbox"
-              multiple
-              value={this.state.dicerList}
-              onChange={this.handleDicerChange}
-              input={<Input/>}
-              renderValue={(selected) => (
-                <div className={classes.chips}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={this.props.roleTable.getName(value)} className={classes.chip}/>
-                  ))}
-                </div>
-              )}
-              MenuProps={MenuProps}
-            >
-              {Object.keys(this.props.roleTable.table).map((roleID) => (
-                <MenuItem key={roleID} value={roleID}>
-                  <Checkbox checked={this.state.dicerList.indexOf(roleID) > -1}/>
-                  <ListItemText primary={this.props.roleTable.getName(roleID)}/>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <br />
-          {/*{personName.map((person) => (*/}
-          {/*  <div>*/}
-          {/*    <TextField*/}
-          {/*      id="outlined-secondary"*/}
-          {/*      variant="outlined"*/}
-          {/*      color="secondary"*/}
-          {/*      size="small"*/}
-          {/*      value={person}*/}
-          {/*      style={{marginRight: '12px'}}*/}
-          {/*    />*/}
-          {/*    <CircularProgress />*/}
-          {/*  </div>*/}
-          {/*))}*/}
-          <Button variant="contained" color="primary">
-            Submit
-          </Button>
-        </div>
-      );
-    } else {
-      return (
-        <></>
-      );
-    }
+    return (
+      <div>
+        <FormControl className={classes.formControl}>
+          <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
+          <Select
+            labelId="kp-selection-checkbox-label"
+            id="kp-selection-checkbox"
+            multiple
+            value={this.state.kpList}
+            onChange={this.handleKpChange}
+            input={<Input/>}
+            renderValue={(selected) => (
+              <div className={classes.chips}>
+                {selected.map((value) => (
+                  <Chip key={value}
+                        label={this.state.roleTable.getName(value)}
+                        className={classes.chip}
+                        size="small"/>
+                ))}
+              </div>
+            )}
+            MenuProps={MenuProps}
+          >
+            {Object.keys(this.state.roleTable.table).map((roleID) => {
+              if (!this.state.dicerList.includes(roleID)) {
+                return (
+                  <MenuItem key={roleID} value={roleID}>
+                    <Checkbox checked={this.state.kpList.includes(roleID)}/>
+                    <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                  </MenuItem>
+                )
+              } else {
+                return null;
+              }
+            })}
+          </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          <InputLabel id="dicer-selection-checkbox-label">Select dicer</InputLabel>
+          <Select
+            labelId="dicer-selection-checkbox-label"
+            id="dicer-selection-checkbox"
+            multiple
+            value={this.state.dicerList}
+            onChange={this.handleDicerChange}
+            input={<Input/>}
+            renderValue={(selected) => (
+              <div className={classes.chips}>
+                {selected.map((value) => (
+                  <Chip key={value}
+                        label={this.state.roleTable.getName(value)}
+                        className={classes.chip}
+                        size="small"/>
+                ))}
+              </div>
+            )}
+            MenuProps={MenuProps}
+          >
+            {Object.keys(this.state.roleTable.table).map((roleID) => {
+              if (!this.state.kpList.includes(roleID)) {
+                return (
+                  <MenuItem key={roleID} value={roleID}>
+                    <Checkbox checked={this.state.dicerList.includes(roleID)}/>
+                    <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                  </MenuItem>
+                );
+              } else {
+                return null;
+              }
+            })}
+          </Select>
+        </FormControl>
+        <br/>
+        <List>
+          {Object.keys(this.state.roleTable.table).map((roleID) => {
+            return (
+              <ListItem key={roleID} dense>
+                <TextField
+                  id={"text-field-role" + roleID}
+                  color="secondary"
+                  size="small"
+                  key={roleID}
+                  value={this.state.roleTable.getName(roleID)}
+                  onChange={(event) => {
+                    this.handleRoleNameChange(roleID, event.target.value);
+                  }}
+                />
+                <ListItemIcon>
+                  <IconButton
+                    style={{color: '#1f1e33'}}
+                    aria-label="change color"
+                    component="span">
+                    <Palette/>
+                  </IconButton>
+                </ListItemIcon>
+              </ListItem>);
+          })}
+        </List>
+        <Button
+          variant="contained"
+          color="secondary"
+          endIcon={<Check/>}
+          onClick={this.handleClick}>
+          Apply
+        </Button>
+      </div>
+    );
   }
 }
 

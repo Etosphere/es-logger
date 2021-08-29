@@ -2,7 +2,7 @@ class Role {
   constructor(id, name, type) {
     this.id = id;
     this.name = name;
-    this.type = type;  // "kp", "dicer", or "player"
+    this.type = type;  // "kp", "dicer", or "pc"
   }
 }
 

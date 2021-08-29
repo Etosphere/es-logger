@@ -17,7 +17,7 @@ class LogScanner {
       let bracketContent = line.match(/<.+>/);  // <xxx>
       if (bracketContent) {
         if (bufferActionContent !== '') {
-          let roleID = this.roleTable.addRole(lastRoleName, 'player');
+          let roleID = this.roleTable.addRole(lastRoleName, 'pc');
           this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
           bufferActionContent = '';
           tokenID += 1;
@@ -32,7 +32,7 @@ class LogScanner {
           this.tokenSequence.push(new Token(tokenID, BlockEnd, null, null));
         } else {
           let tokenContent = line.split('>')[1].trim();
-          let roleID = this.roleTable.addRole(skipBracketContent, 'player');
+          let roleID = this.roleTable.addRole(skipBracketContent, 'pc');
           if (tokenContent[0] === '(' || tokenContent[0] === '（') {
             this.tokenSequence.push(
               new Token(tokenID, Comment, roleID, tokenContent));
@@ -48,7 +48,7 @@ class LogScanner {
           }
         }
       } else {
-        let roleID = this.roleTable.addRole(lastRoleName, 'player');
+        let roleID = this.roleTable.addRole(lastRoleName, 'pc');
         if (line[0] === '(' || line[0] === '（') {
           if (bufferActionContent !== '') {
             this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
@@ -72,7 +72,7 @@ class LogScanner {
       tokenID += 1;
     });
     if (bufferActionContent !== '') {
-      let roleID = this.roleTable.addRole(lastRoleName, 'player');
+      let roleID = this.roleTable.addRole(lastRoleName, 'pc');
       // push action token at last line
       this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
       bufferActionContent = '';

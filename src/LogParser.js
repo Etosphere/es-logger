@@ -1,11 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
-import { Button, Input } from '@material-ui/core';
-import { CloudUpload } from '@material-ui/icons';
+import {Button} from '@material-ui/core';
+import {Publish, Send} from '@material-ui/icons';
 import LogScanner from './LogScanner';
-import LogFilter from './LogFilter';
 import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
+import LogFilter from "./LogFilter";
 
 export const Start = Symbol('Start');
 export const StartPrime = Symbol('Start\'');
@@ -24,7 +24,9 @@ class ParseTreeNode {
     this.children = [];
   }
 
-  addChild = (node) => { this.children.push(node); };
+  addChild = (node) => {
+    this.children.push(node);
+  };
 }
 
 class SyntaxTreeNode {
@@ -36,7 +38,9 @@ class SyntaxTreeNode {
     this.children = [];
   }
 
-  addChild = (node) => { this.children.push(node); };
+  addChild = (node) => {
+    this.children.push(node);
+  };
 }
 
 class LogParser extends React.Component {
@@ -244,7 +248,6 @@ class LogParser extends React.Component {
   }
 
   handleFileUpload(event) {
-    event.preventDefault();
     const fileReader = new FileReader();
     fileReader.onload = this.handleFileRead;
     fileReader.readAsText(this.state.selectedFile);
@@ -282,8 +285,8 @@ class LogParser extends React.Component {
     let traverseFilter = (node, parentNode) => {
       if (node) {
         // make a clone to prevent wrong index made by deletion in iteration
-        node.children.slice(0).
-          forEach((child, _) => traverseFilter(child, node));
+        node.children.slice(0)
+          .forEach((child, _) => traverseFilter(child, node));
         if (node.type === Block) {
           if ((node.children.length === 0 && parentNode) ||
             isIntersectionEmpty(node.role, reservedRoleArray)) {
@@ -350,25 +353,45 @@ class LogParser extends React.Component {
     return (
       <div>
         <div>
-          <Input id="upload-file-button" type="file" onChange={this.handleFileChange}/>
+          <input
+            hidden
+            id="contained-button-file"
+            multiple
+            type="file"
+            onChange={this.handleFileChange}
+          />
+          <label htmlFor="contained-button-file">
+            <Button
+              variant="contained"
+              color="default"
+              component="span"
+              endIcon={<Publish/>}
+            >
+              Upload
+            </Button>
+          </label>
+          {this.state.selectedFile &&
           <Button
             variant="contained"
-            color="default"
+            color="primary"
             component="span"
-            startIcon={<CloudUpload />}
+            endIcon={<Send/>}
             onClick={this.handleFileUpload}>
-            Upload
-          </Button>
+            Submit
+          </Button>}
         </div>
-        {/*<LogFilter logFilter={this.state.logFilter}*/}
-        {/*           roleTable={this.state.roleTable}*/}
-        {/*           onChange={this.handleCheckboxChange}*/}
-        {/*           onSubmit={(e) => {*/}
-        {/*             e.preventDefault();*/}
-        {/*             this.filterNodeByRole();*/}
-        {/*           }}/>*/}
+        {this.state.roleTable &&
         <RoleConfigurator roleTable={this.state.roleTable}
-                          onChange={this.handleRoleTableChange}/>
+                          onSubmit={this.handleRoleTableChange}/>
+        }
+
+        <LogFilter logFilter={this.state.logFilter}
+                   roleTable={this.state.roleTable}
+                   onChange={this.handleCheckboxChange}
+                   onSubmit={(e) => {
+                     e.preventDefault();
+                     this.filterNodeByRole();
+                   }}/>
         <this.LogRender node={this.state.filteredTreeRoot}
                         roleTable={this.state.roleTable}/>
       </div>
