@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {Button} from '@material-ui/core';
+import {Button, Grid} from '@material-ui/core';
 import {Publish, Send} from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import * as Token from './Token';
@@ -247,7 +247,7 @@ class LogParser extends React.Component {
     this.initializeLogFilter();
   }
 
-  handleFileUpload(event) {
+  handleFileUpload() {
     const fileReader = new FileReader();
     fileReader.onload = this.handleFileRead;
     fileReader.readAsText(this.state.selectedFile);
@@ -350,9 +350,9 @@ class LogParser extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <div>
+    return ([
+      <Grid container spacing={1} alignItems='center' justifyContent='center' direction='column'>
+        <Grid item xs align='center'>
           <input
             hidden
             id="contained-button-file"
@@ -367,10 +367,12 @@ class LogParser extends React.Component {
               component="span"
               endIcon={<Publish/>}
             >
-              Upload
+              Browse
             </Button>
           </label>
-          {this.state.selectedFile &&
+        </Grid>
+        {this.state.selectedFile &&
+        <Grid item xs align='center'>
           <Button
             variant="contained"
             color="primary"
@@ -378,24 +380,26 @@ class LogParser extends React.Component {
             endIcon={<Send/>}
             onClick={this.handleFileUpload}>
             Submit
-          </Button>}
-        </div>
+          </Button>
+        </Grid>}
+      </Grid>,
+      <Grid container alignItems='center' justifyContent='center'>
         {this.state.roleTable &&
         <RoleConfigurator roleTable={this.state.roleTable}
                           onSubmit={this.handleRoleTableChange}/>
         }
-
-        <LogFilter logFilter={this.state.logFilter}
-                   roleTable={this.state.roleTable}
-                   onChange={this.handleCheckboxChange}
-                   onSubmit={(e) => {
-                     e.preventDefault();
-                     this.filterNodeByRole();
-                   }}/>
-        <this.LogRender node={this.state.filteredTreeRoot}
-                        roleTable={this.state.roleTable}/>
-      </div>
-    );
+      </Grid>,
+      <hr hidden={!this.state.roleTable}/>,
+      <LogFilter logFilter={this.state.logFilter}
+                 roleTable={this.state.roleTable}
+                 onChange={this.handleCheckboxChange}
+                 onSubmit={(e) => {
+                   e.preventDefault();
+                   this.filterNodeByRole();
+                 }}/>,
+      <this.LogRender node={this.state.filteredTreeRoot}
+                      roleTable={this.state.roleTable}/>
+    ]);
   }
 }
 
