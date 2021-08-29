@@ -5,6 +5,7 @@ import { CloudUpload } from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import LogFilter from './LogFilter';
 import * as Token from './Token';
+import RoleConfigurator from "./RoleConfigurator";
 
 export const Start = Symbol('Start');
 export const StartPrime = Symbol('Start\'');
@@ -53,6 +54,7 @@ class LogParser extends React.Component {
     this.handleFileRead = this.handleFileRead.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.handleRoleTableChange = this.handleRoleTableChange.bind(this);
     this.LogRender = this.LogRender.bind(this);
   }
 
@@ -252,6 +254,10 @@ class LogParser extends React.Component {
     this.setState({logFilter: newLogFilter});
   }
 
+  handleRoleTableChange(newRoleTable) {
+    this.setState({roleTable: newRoleTable});
+  }
+
   // post-order traversal to delete nodes according to role filter checkboxes
   // deletion rule:
   //   1. If none of the reserved roles appear in the Block (except kp and dicer), delete the Block (and its children) node.
@@ -304,12 +310,6 @@ class LogParser extends React.Component {
     this.setState({filteredTreeRoot: filteredTree});
   }
 
-  SpecialRoleSelector(props) {
-    return (
-      <></>
-    );
-  }
-
   LogRender(props) {
     let children = null;
     if (props.node && props.node.children !== 0) {
@@ -360,14 +360,15 @@ class LogParser extends React.Component {
             Upload
           </Button>
         </div>
-        <this.SpecialRoleSelector />
-        <LogFilter logFilter={this.state.logFilter}
-                   roleTable={this.state.roleTable}
-                   onChange={this.handleCheckboxChange}
-                   onSubmit={(e) => {
-                     e.preventDefault();
-                     this.filterNodeByRole();
-                   }}/>
+        {/*<LogFilter logFilter={this.state.logFilter}*/}
+        {/*           roleTable={this.state.roleTable}*/}
+        {/*           onChange={this.handleCheckboxChange}*/}
+        {/*           onSubmit={(e) => {*/}
+        {/*             e.preventDefault();*/}
+        {/*             this.filterNodeByRole();*/}
+        {/*           }}/>*/}
+        <RoleConfigurator roleTable={this.state.roleTable}
+                          onChange={this.handleRoleTableChange}/>
         <this.LogRender node={this.state.filteredTreeRoot}
                         roleTable={this.state.roleTable}/>
       </div>
