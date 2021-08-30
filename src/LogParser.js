@@ -6,6 +6,7 @@ import LogScanner from './LogScanner';
 import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
 import LogFilter from "./LogFilter";
+import LogRender from "./LogRender";
 
 export const Start = Symbol('Start');
 export const StartPrime = Symbol('Start\'');
@@ -59,7 +60,6 @@ class LogParser extends React.Component {
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleRoleTableChange = this.handleRoleTableChange.bind(this);
-    this.LogRender = this.LogRender.bind(this);
   }
 
   // syntax:
@@ -312,42 +312,6 @@ class LogParser extends React.Component {
     this.setState({filteredTreeRoot: filteredTree});
   }
 
-  LogRender(props) {
-    let children = null;
-    if (props.node && props.node.children !== 0) {
-      children = (
-        <ul style={{listStyleType: 'none', margin: 0}}>
-          {props.node.children.map((i) => (
-            <this.LogRender node={i} key={'log-node-' + i.id} roleTable={props.roleTable}/>
-          ))}
-        </ul>
-      );
-      if (props.node.type === Block) {
-        let blockRoles = props.node.role.map((roleID) => props.roleTable.getName(roleID)).join(', ');
-        if (props.node.id === 0) {
-          // not render the root Block node
-          return (<div>{children}</div>);
-        } else {
-          return (
-            <li>
-              <span>[{blockRoles}]</span>
-              {children}
-            </li>
-          );
-        }
-      } else {
-        return (
-          <li>
-            <span>&lt;{props.roleTable.getName(props.node.role)}&gt;</span> {props.node.content}
-            {children}
-          </li>
-        );
-      }
-    } else {
-      return null;
-    }
-  }
-
   render() {
     return ([
       <Grid key='handle-file-grid' container spacing={1} direction='column'>
@@ -397,9 +361,9 @@ class LogParser extends React.Component {
                    e.preventDefault();
                    this.filterNodeByRole();
                  }}/>,
-      <this.LogRender key='render'
-                      node={this.state.filteredTreeRoot}
-                      roleTable={this.state.roleTable}/>
+      <LogRender key='render'
+                 node={this.state.filteredTreeRoot}
+                 roleTable={this.state.roleTable}/>
     ]);
   }
 }
