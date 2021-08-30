@@ -67,24 +67,14 @@ class RoleConfigurator extends React.Component {
   }
 
   handleKpChange(event) {
-    let tempRoleTable = this.state.roleTable;
-    this.state.kpList.forEach((role) => {
-      tempRoleTable.setType(role, 'kp');
-    });
     this.setState({
       kpList: event.target.value,
-      roleTable: tempRoleTable
     });
   }
 
   handleDicerChange(event) {
-    let tempRoleTable = this.state.roleTable;
-    this.state.dicerList.forEach((role) => {
-      tempRoleTable.setType(role, 'dicer');
-    });
     this.setState({
       dicerList: event.target.value,
-      roleTable: tempRoleTable
     });
   }
 
@@ -101,6 +91,15 @@ class RoleConfigurator extends React.Component {
   }
 
   handleClick() {
+    Object.keys(this.state.roleTable.table).forEach((roleID) => {
+      this.state.roleTable.setType(roleID, 'pc');
+    })
+    this.state.kpList.forEach((role) => {
+      this.state.roleTable.setType(role, 'kp');
+    });
+    this.state.dicerList.forEach((role) => {
+      this.state.roleTable.setType(role, 'dicer');
+    });
     this.props.onSubmit(this.state.roleTable);
   }
 
@@ -195,6 +194,9 @@ class RoleConfigurator extends React.Component {
                     color="secondary"
                     size="small"
                     key={'text-' + roleID}
+                    InputProps={{
+                      style: {color: this.state.roleTable.getColor(roleID)}
+                    }}
                     value={this.state.roleTable.getName(roleID)}
                     onChange={(event) => {
                       this.handleRoleNameChange(roleID, event.target.value);
@@ -210,7 +212,7 @@ class RoleConfigurator extends React.Component {
           </List>
         </Grid>
       </Grid>,
-      <Grid container key='apply-button-grid'>
+      <Grid container key='apply-button-grid' style={{marginBottom: '1em'}}>
         <Grid item xs align='center'>
           <Button
             variant="contained"

@@ -61,6 +61,7 @@ class LogParser extends React.Component {
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleRoleTableChange = this.handleRoleTableChange.bind(this);
+    this.filterNodeByRole = this.filterNodeByRole.bind(this);
   }
 
   // syntax:
@@ -262,10 +263,12 @@ class LogParser extends React.Component {
     this.setState({roleTable: newRoleTable});
   }
 
-  // post-order traversal to delete nodes according to role filter checkboxes
+  // post-order traversal to delete nodes add update collapse states according to role filter checkboxes
   // deletion rule:
   //   1. If none of the reserved roles appear in the Block (except kp and dicer), delete the Block (and its children) node.
   //   2. If is a action / command / comment node and is filtered out according to the checkboxes, delete it.
+  // collapsing rule:
+  //   If there exists a reserved role that does not appear in the Block node, collapse the node.
   filterNodeByRole() {
     // get all reserved roles from rileFilter
     let reservedRoleArray = [];
@@ -280,6 +283,10 @@ class LogParser extends React.Component {
       return !array1.map((item) => array2.includes(item)).includes(true);
     };
 
+    let isSubsetOf = (array1, array2) => {
+      return array1.every((value) => array2.includes(value));
+    }
+
     let filteredTree = _.cloneDeep(this.state.syntaxTreeRoot);
 
     let traverseFilter = (node, parentNode) => {
@@ -288,6 +295,7 @@ class LogParser extends React.Component {
         node.children.slice(0)
           .forEach((child, _) => traverseFilter(child, node));
         if (node.type === Block) {
+          node.collapsed = !isSubsetOf(reservedRoleArray, node.role);
           if ((node.children.length === 0 && parentNode) ||
             isIntersectionEmpty(node.role, reservedRoleArray)) {
             // Block is empty or no reserved roles appear
@@ -297,6 +305,7 @@ class LogParser extends React.Component {
             node = null;
           }
         } else {
+          node.collapsed = false;
           // check for filtering command / comment
           if ((node.type === Command && (!this.state.logFilter.command)) ||
             (node.type === Comment && (!this.state.logFilter.comment))) {
@@ -356,17 +365,21 @@ class LogParser extends React.Component {
         }
       </Grid>,
       <hr hidden={!this.state.roleTable} key='hr'/>,
-      <LogFilter key='filter'
-                 logFilter={this.state.logFilter}
-                 roleTable={this.state.roleTable}
-                 onChange={this.handleCheckboxChange}
-                 onSubmit={(e) => {
-                   e.preventDefault();
-                   this.filterNodeByRole();
-                 }}/>,
-      <LogRender key='render'
-                 node={this.state.filteredTreeRoot}
-                 roleTable={this.state.roleTable}/>
+      <Grid container key='role-filter-grid'>
+        {this.state.logFilter.hasOwnProperty('role') &&
+        <LogFilter key='filter'
+                   logFilter={this.state.logFilter}
+                   roleTable={this.state.roleTable}
+                   onChange={this.handleCheckboxChange}
+                   onSubmit={this.filterNodeByRole}/>
+        }
+      </Grid>,
+      <Container key='log-render-container' maxWidth="md">
+        {Object.keys(this.state.logFilter).length > 0 &&
+        <LogRender key='render'
+                   node={this.state.filteredTreeRoot}
+                   roleTable={this.state.roleTable}/>}
+      </Container>
     ]);
   }
 }

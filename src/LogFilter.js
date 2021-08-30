@@ -1,66 +1,88 @@
 import React from 'react';
+import {Button, Checkbox, Grid} from "@material-ui/core";
+import {Description} from "@material-ui/icons";
 
 class LogFilter extends React.Component {
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      logFilter: this.props.logFilter
+    }
+
+    this.handleRoleChange = this.handleRoleChange.bind(this);
+    this.handleCommandChange = this.handleCommandChange.bind(this);
+    this.handleCommentChange = this.handleCommentChange.bind(this);
   }
 
-  handleChange(event) {
-    let role = event.target.attributes.getNamedItem('data-role').value;
-    let nodeType = event.target.attributes.getNamedItem('data-node-type').value;
-    let tempLogFilter = this.props.logFilter;
-    if (nodeType === 'role') {
-      tempLogFilter.role[role] = !tempLogFilter.role[role];
-    } else if (nodeType === 'command') {
-      tempLogFilter.command = !tempLogFilter.command;
-    } else if (nodeType === 'comment') {
-      tempLogFilter.comment = !tempLogFilter.comment;
-    }
-    this.props.onChange(tempLogFilter);
+  handleRoleChange(event) {
+    let role = event.target.value;
+    let tempLogFilter = this.state.logFilter;
+    tempLogFilter.role[role] = !tempLogFilter.role[role];
+    this.setState({logFilter: tempLogFilter});
+  }
+
+  handleCommandChange() {
+    let tempLogFilter = this.state.logFilter;
+    tempLogFilter.command = !tempLogFilter.command;
+    this.setState({logFilter: tempLogFilter});
+  }
+
+  handleCommentChange() {
+    let tempLogFilter = this.state.logFilter;
+    tempLogFilter.comment = !tempLogFilter.comment;
+    this.setState({logFilter: tempLogFilter});
   }
 
   render() {
     let filterElement = [];
-    if (this.props.logFilter.role) {
-      Object.keys(this.props.logFilter.role).forEach((role) => {
-        filterElement.push(
-          <label id={'label-role-' + role} key={'checkbox-role-' + role}>
-            <input type="checkbox" id={'checkbox-role-' + role}
-                   data-role={role} data-node-type="role"
-                   checked={this.props.logFilter.role[role]}
-                   onChange={this.handleChange}
-                   value={this.props.logFilter.role[role]}/>
-            {this.props.roleTable.getName(role)}
-          </label>,
-        );
-      });
+    if (this.state.logFilter.role) {
+      for (let role in this.state.logFilter.role) {
+        if (this.props.roleTable.getType(role) === 'pc') {
+          filterElement.push(
+            <label id={'label-role-' + role} key={'checkbox-role-' + role}>
+              <Checkbox id={'checkbox-role-' + role}
+                        checked={this.state.logFilter.role[role]}
+                        onChange={this.handleRoleChange}
+                        value={role}/>
+              {this.props.roleTable.getName(role)}
+            </label>,
+          );
+        }
+      }
       filterElement.push(<br key='br-role'/>);
       filterElement.push(
         <label id="command" key="command">
-          <input type="checkbox" id={'checkbox-command'}
-                 data-role="all" data-node-type="command"
-                 checked={this.props.logFilter.command}
-                 onChange={this.handleChange} value={this.props.command}/>
+          <Checkbox id={'checkbox-command'}
+                 checked={this.state.logFilter.command}
+                 onChange={this.handleCommandChange} value={this.state.command}/>
           Command
         </label>);
       filterElement.push(
         <label id="comment" key="comment">
-          <input type="checkbox" id={'checkbox-comment'}
-                 data-role="all" data-node-type="comment"
-                 checked={this.props.logFilter.comment}
-                 onChange={this.handleChange} value={this.props.command}/>
+          <Checkbox id={'checkbox-comment'}
+                 checked={this.state.logFilter.comment}
+                 onChange={this.handleCommentChange} value={this.state.command}/>
           Comment
         </label>,
       );
     }
     if (filterElement.length !== 0) {
       return (
-        <form onSubmit={this.props.onSubmit}>
-          {filterElement}
-          <br/>
-          <input type="submit" value="Submit"/>
-        </form>
+        <Grid container style={{marginBottom: '1em'}}>
+          <Grid item sm>
+            {filterElement}
+          </Grid>
+          <Grid item xs align='center'>
+            <Button
+              variant="contained"
+              color="secondary"
+              component="span"
+              endIcon={<Description/>}
+              onClick={this.props.onSubmit}>
+              Render
+            </Button>
+          </Grid>
+        </Grid>
       );
     } else {
       return <div/>;

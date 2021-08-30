@@ -49,26 +49,6 @@ class RoleTable {
     }
   }
 
-  getKpID() {
-    let roleArray = Object.values(this.table);
-    for (let i = 0; i < roleArray.length; i++) {
-      if (roleArray[i].type === 'kp') {
-        return roleArray[i].id;
-      }
-    }
-    return null;
-  }
-
-  getDicerID() {
-    let roleArray = Object.values(this.table);
-    for (let i = 0; i < roleArray.length; i++) {
-      if (roleArray[i].type === 'dicer') {
-        return roleArray[i].id;
-      }
-    }
-    return null;
-  }
-
   getRoleIdByName(name) {
     let roleArray = Object.values(this.table);
     for (let i = 0; i < roleArray.length; i++) {
