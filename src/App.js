@@ -17,7 +17,8 @@ const theme = createTheme({
           fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
         },
         header: {
-          textAlign: 'center'
+          textAlign: 'center',
+          marginBottom: '2em',
         }
       }
     },

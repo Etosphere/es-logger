@@ -1,12 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import {Button, Grid} from '@material-ui/core';
+import {Button, Container, Grid} from '@material-ui/core';
 import {Publish, Send} from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
 import LogFilter from "./LogFilter";
 import LogRender from "./LogRender";
+import BackToTopButton from "./BackToTopButton";
 
 export const Start = Symbol('Start');
 export const StartPrime = Symbol('Start\'');
@@ -314,6 +315,8 @@ class LogParser extends React.Component {
 
   render() {
     return ([
+      <div id="back-to-top-anchor" key='back-to-top-anchor'/>,
+      <BackToTopButton key='back-to-top-button'/>,
       <Grid key='handle-file-grid' container spacing={1} direction='column'>
         <Grid item xs align='center'>
           <input
