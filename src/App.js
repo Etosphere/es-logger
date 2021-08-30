@@ -1,5 +1,4 @@
 import {createTheme, ThemeProvider, CssBaseline, Container} from "@material-ui/core";
-import '@fontsource/roboto';
 import LogParser from './LogParser';
 
 const theme = createTheme({
