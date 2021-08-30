@@ -1,6 +1,19 @@
 import Token, {BlockBegin, BlockEnd, Action, Command, Comment, EOF} from './Token';
 import {RoleTable} from './Role';
 
+const getRandomHSLAColor = (minH, maxH, minS, maxS, minL, maxL, minA, maxA) => {
+  const getRandomNumber = (low, high) => {
+    return Math.round(Math.random() * (high - low)) + low;
+  }
+
+  let hue = getRandomNumber(minH, maxH);
+  let saturation = getRandomNumber(minS, maxS);
+  let lightness = getRandomNumber(minL, maxL);
+  let alpha = getRandomNumber(minA * 100, maxA * 100) / 100;
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
+}
+
 class LogScanner {
   constructor(rawLogData) {
     this.rawLogData = rawLogData;
@@ -17,7 +30,7 @@ class LogScanner {
       let bracketContent = line.match(/<.+>/);  // <xxx>
       if (bracketContent) {
         if (bufferActionContent !== '') {
-          let roleID = this.roleTable.addRole(lastRoleName, 'pc');
+          let roleID = this.roleTable.addRole(lastRoleName, 'pc', getRandomHSLAColor(0, 360, 20, 80, 0, 75, 1, 1));
           this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
           bufferActionContent = '';
           tokenID += 1;
@@ -32,7 +45,7 @@ class LogScanner {
           this.tokenSequence.push(new Token(tokenID, BlockEnd, null, null));
         } else {
           let tokenContent = line.split('>')[1].trim();
-          let roleID = this.roleTable.addRole(skipBracketContent, 'pc');
+          let roleID = this.roleTable.addRole(skipBracketContent, 'pc', getRandomHSLAColor(0, 360, 20, 80, 0, 75, 1, 1));
           if (tokenContent[0] === '(' || tokenContent[0] === '（') {
             this.tokenSequence.push(
               new Token(tokenID, Comment, roleID, tokenContent));
@@ -48,7 +61,7 @@ class LogScanner {
           }
         }
       } else {
-        let roleID = this.roleTable.addRole(lastRoleName, 'pc');
+        let roleID = this.roleTable.addRole(lastRoleName, 'pc', getRandomHSLAColor(0, 360, 20, 80, 0, 75, 1, 1));
         if (line[0] === '(' || line[0] === '（') {
           if (bufferActionContent !== '') {
             this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
@@ -72,7 +85,7 @@ class LogScanner {
       tokenID += 1;
     });
     if (bufferActionContent !== '') {
-      let roleID = this.roleTable.addRole(lastRoleName, 'pc');
+      let roleID = this.roleTable.addRole(lastRoleName, 'pc', getRandomHSLAColor(0, 360, 20, 80, 0, 75, 1, 1));
       // push action token at last line
       this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
       bufferActionContent = '';

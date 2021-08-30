@@ -268,10 +268,9 @@ class LogParser extends React.Component {
   filterNodeByRole() {
     // get all reserved roles from rileFilter
     let reservedRoleArray = [];
-    Object.keys(this.state.logFilter.role).forEach((role) => {
-      // TODO: remove "kp" and "dicer" from reserved role array
-      if (role !== 'kp' && role !== 'dicer' && this.state.logFilter.role[role]) {
-        reservedRoleArray.push(role);
+    Object.keys(this.state.logFilter.role).forEach((roleID) => {
+      if (this.state.roleTable.getType(roleID) === 'pc' && this.state.logFilter.role[roleID]) {
+        reservedRoleArray.push(roleID);
       }
     });
     reservedRoleArray = reservedRoleArray.map((roleID) => parseInt(roleID));
@@ -351,7 +350,7 @@ class LogParser extends React.Component {
 
   render() {
     return ([
-      <Grid container spacing={1} direction='column'>
+      <Grid key='handle-file-grid' container spacing={1} direction='column'>
         <Grid item xs align='center'>
           <input
             hidden
@@ -383,21 +382,23 @@ class LogParser extends React.Component {
           </Button>
         </Grid>}
       </Grid>,
-      <Grid container>
+      <Grid container key='role-configurator-grid'>
         {this.state.roleTable &&
         <RoleConfigurator roleTable={this.state.roleTable}
                           onSubmit={this.handleRoleTableChange}/>
         }
       </Grid>,
-      <hr hidden={!this.state.roleTable}/>,
-      <LogFilter logFilter={this.state.logFilter}
+      <hr hidden={!this.state.roleTable} key='hr'/>,
+      <LogFilter key='filter'
+                 logFilter={this.state.logFilter}
                  roleTable={this.state.roleTable}
                  onChange={this.handleCheckboxChange}
                  onSubmit={(e) => {
                    e.preventDefault();
                    this.filterNodeByRole();
                  }}/>,
-      <this.LogRender node={this.state.filteredTreeRoot}
+      <this.LogRender key='render'
+                      node={this.state.filteredTreeRoot}
                       roleTable={this.state.roleTable}/>
     ]);
   }

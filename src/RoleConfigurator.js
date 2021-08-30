@@ -10,10 +10,10 @@ import {
   Chip,
   TextField,
   Button,
-  IconButton,
   withStyles, List, ListItem, ListItemIcon, Grid
 } from "@material-ui/core";
-import {Check, Palette} from "@material-ui/icons";
+import {Check} from "@material-ui/icons";
+import ColorPicker from "./ColorPicker";
 
 const styles = (theme) => ({
   formControl: {
@@ -62,6 +62,7 @@ class RoleConfigurator extends React.Component {
     this.handleKpChange = this.handleKpChange.bind(this);
     this.handleDicerChange = this.handleDicerChange.bind(this);
     this.handleRoleNameChange = this.handleRoleNameChange.bind(this);
+    this.handleColorChange = this.handleColorChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -93,6 +94,12 @@ class RoleConfigurator extends React.Component {
     this.setState({roleTable: tempRoleTable});
   }
 
+  handleColorChange(roleID, newRoleColor) {
+    let tempRoleTable = this.state.roleTable;
+    tempRoleTable.setColor(roleID, newRoleColor);
+    this.setState({roleTable: tempRoleTable});
+  }
+
   handleClick() {
     this.props.onSubmit(this.state.roleTable);
   }
@@ -101,7 +108,7 @@ class RoleConfigurator extends React.Component {
     const classes = this.props.classes;
 
     return ([
-      <Grid container>
+      <Grid container key='kp-and-dicer-configurator-grid'>
         <Grid item xs align='right'>
           <FormControl className={classes.formControl}>
             <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
@@ -177,7 +184,7 @@ class RoleConfigurator extends React.Component {
           </FormControl>
         </Grid>
       </Grid>,
-      <Grid container>
+      <Grid container key='name-and-color-configurator-grid'>
         <Grid item xs align='center'>
           <List>
             {Object.keys(this.state.roleTable.table).map((roleID) => {
@@ -187,26 +194,23 @@ class RoleConfigurator extends React.Component {
                     id={"text-field-role" + roleID}
                     color="secondary"
                     size="small"
-                    key={roleID}
+                    key={'text-' + roleID}
                     value={this.state.roleTable.getName(roleID)}
                     onChange={(event) => {
                       this.handleRoleNameChange(roleID, event.target.value);
                     }}
                   />
-                  <ListItemIcon style={{minWidth: 0}}>
-                    <IconButton
-                      style={{color: '#1f1e33'}}
-                      aria-label="change color"
-                      component="span">
-                      <Palette/>
-                    </IconButton>
+                  <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}}>
+                    <ColorPicker id={roleID}
+                                 color={this.state.roleTable.getColor(roleID)}
+                                 onChangeComplete={(color) => {this.handleColorChange(roleID, color.hex)}}/>
                   </ListItemIcon>
                 </ListItem>);
             })}
           </List>
         </Grid>
       </Grid>,
-      <Grid container>
+      <Grid container key='apply-button-grid'>
         <Grid item xs align='center'>
           <Button
             variant="contained"
