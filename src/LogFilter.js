@@ -39,51 +39,55 @@ class LogFilter extends React.Component {
         if (this.props.roleTable.getType(role) === 'pc') {
           filterElement.push(
             <ListItem key={role} button onClick={() => this.handleRoleChange(role)}>
-              <ListItemIcon>
+              <ListItemIcon key={'icon-' + role}>
                 <Checkbox
+                  key={role}
                   edge="start"
                   checked={this.state.logFilter.role[role]}
                 />
               </ListItemIcon>
-              <ListItemText id={'label-role-' + role} primary={this.props.roleTable.getName(role)} />
+              <ListItemText key={'label-role-' + role} primary={this.props.roleTable.getName(role)} />
             </ListItem>
           );
         }
       }
-      filterElement.push(<Divider/>);
+      filterElement.push(<Divider key='divider'/>);
       filterElement.push(
         <ListItem key='command' button onClick={this.handleCommandChange}>
-          <ListItemIcon>
+          <ListItemIcon key='command-icon'>
             <Checkbox
+              key='command-checkbox'
               edge="start"
               checked={this.state.logFilter.command}
             />
           </ListItemIcon>
-          <ListItemText id={'label-command'} primary='Command'/>
+          <ListItemText id='label-command' key='label-command' primary='Command'/>
         </ListItem>);
       filterElement.push(
         <ListItem key='comment' button onClick={this.handleCommentChange}>
-          <ListItemIcon>
+          <ListItemIcon key='comment-icon'>
             <Checkbox
+              key='comment-checkbox'
               edge="start"
               checked={this.state.logFilter.comment}
             />
           </ListItemIcon>
-          <ListItemText id={'label-comment'} primary='Comment'/>
+          <ListItemText id='label-comment' key='label-comment' primary='Comment'/>
         </ListItem>);
     }
     if (filterElement.length !== 0) {
       return (
         <Grid container direction="column"
               justifyContent="center" alignItems="center"
-              style={{marginBottom: '3em'}}>
-          <Grid item sm align='center'>
-            <List dense disablePadding>
+              style={{marginBottom: '3em'}} key='filter-grid'>
+          <Grid item sm align='center' key='filter-list-grid'>
+            <List dense disablePadding key='filter-list'>
               {filterElement}
             </List>
           </Grid>
-          <Grid item sm align='center'>
+          <Grid item sm align='center' key='render-button-grid'>
             <Button
+              key='render-button'
               variant="contained"
               color="secondary"
               component="span"

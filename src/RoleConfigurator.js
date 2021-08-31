@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 import {Check} from "@material-ui/icons";
 import ColorPicker from "./ColorPicker";
+import _ from "lodash";
 
 const styles = (theme) => ({
   formControl: {
@@ -116,7 +117,7 @@ class RoleConfigurator extends React.Component {
   }
 
   handleClick() {
-    this.props.onSubmit(this.state.roleTable);
+    this.props.onSubmit(_.cloneDeep(this.state.roleTable));
   }
 
   render() {

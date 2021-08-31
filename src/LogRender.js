@@ -90,6 +90,7 @@ class LogRender extends React.Component {
           defaultExpanded={['root']}
           defaultExpandIcon={<ChevronRight/>}
           disableSelection
+          style={{marginBottom: '48px'}}
         >
           {renderTree(this.props.node)}
         </TreeView>
