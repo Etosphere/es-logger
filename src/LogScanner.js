@@ -29,10 +29,11 @@ class LogScanner {
     logArray.forEach((line, _) => {
       let bracketContent = line.match(/<.+>/);  // <xxx>
       if (bracketContent) {
-        if (bufferActionContent !== '') {
+        if (lastRoleName !== '') {
           let roleID = this.roleTable.addRole(lastRoleName, 'pc', getRandomHSLAColor(0, 360, 20, 80, 0, 75, 1, 1));
           this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
           bufferActionContent = '';
+          lastRoleName = '';
           tokenID += 1;
         }
         bracketContent = bracketContent[0];
