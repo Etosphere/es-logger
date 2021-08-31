@@ -10,7 +10,7 @@ import {
   Chip,
   TextField,
   Button,
-  withStyles, List, ListItem, ListItemIcon, Grid
+  withStyles, List, ListItem, ListItemIcon, Grid, ListSubheader
 } from "@material-ui/core";
 import {Check} from "@material-ui/icons";
 import ColorPicker from "./ColorPicker";
@@ -19,15 +19,16 @@ const styles = (theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
-    maxWidth: 360
+    maxWidth: 240
   },
   chips: {
     display: "flex",
     flexWrap: "wrap"
   },
   chip: {
-    marginLeft: 2,
+    marginTop: 2,
     marginRight: 2,
+    marginBottom: 2,
     maxWidth: 100,
     overflow: 'hidden',
     label: {
@@ -67,14 +68,38 @@ class RoleConfigurator extends React.Component {
   }
 
   handleKpChange(event) {
+    let tempRoleTable = this.state.roleTable;
+    let newKpList = event.target.value;
+    Object.keys(tempRoleTable.table).forEach((roleID) => {
+      tempRoleTable.setType(roleID, 'pc');
+    })
+    newKpList.forEach((role) => {
+      tempRoleTable.setType(role, 'kp');
+    });
+    this.state.dicerList.forEach((role) => {
+      tempRoleTable.setType(role, 'dicer');
+    });
     this.setState({
-      kpList: event.target.value,
+      kpList: newKpList,
+      roleTable: tempRoleTable
     });
   }
 
   handleDicerChange(event) {
+    let tempRoleTable = this.state.roleTable;
+    let newDicerList = event.target.value;
+    Object.keys(tempRoleTable.table).forEach((roleID) => {
+      tempRoleTable.setType(roleID, 'pc');
+    })
+    this.state.kpList.forEach((role) => {
+      tempRoleTable.setType(role, 'kp');
+    });
+    newDicerList.forEach((role) => {
+      tempRoleTable.setType(role, 'dicer');
+    });
     this.setState({
-      dicerList: event.target.value,
+      dicerList: newDicerList,
+      roleTable: tempRoleTable
     });
   }
 
@@ -91,20 +116,42 @@ class RoleConfigurator extends React.Component {
   }
 
   handleClick() {
-    Object.keys(this.state.roleTable.table).forEach((roleID) => {
-      this.state.roleTable.setType(roleID, 'pc');
-    })
-    this.state.kpList.forEach((role) => {
-      this.state.roleTable.setType(role, 'kp');
-    });
-    this.state.dicerList.forEach((role) => {
-      this.state.roleTable.setType(role, 'dicer');
-    });
     this.props.onSubmit(this.state.roleTable);
   }
 
   render() {
     const classes = this.props.classes;
+
+    const kpTable = Object.keys(this.state.roleTable.table)
+      .filter((roleID) => this.state.roleTable.getType(roleID) === 'kp');
+    const dicerTable = Object.keys(this.state.roleTable.table)
+      .filter((roleID) => this.state.roleTable.getType(roleID) === 'dicer');
+    const pcTable = Object.keys(this.state.roleTable.table)
+      .filter((roleID) => this.state.roleTable.getType(roleID) === 'pc');
+
+    const generateListItem = (roleID) => (
+      <ListItem key={roleID} dense disableGutters={true} style={{justifyContent: 'center'}}>
+        <TextField
+          id={"text-field-role" + roleID}
+          color="secondary"
+          size="small"
+          key={'text-' + roleID}
+          InputProps={{
+            style: {color: this.state.roleTable.getColor(roleID)}
+          }}
+          value={this.state.roleTable.getName(roleID)}
+          onChange={(event) => {
+            this.handleRoleNameChange(roleID, event.target.value);
+          }}
+        />
+        <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}}>
+          <ColorPicker id={roleID}
+                       color={this.state.roleTable.getColor(roleID)}
+                       onChangeComplete={(color) => {
+                         this.handleColorChange(roleID, color.hex)
+                       }}/>
+        </ListItemIcon>
+      </ListItem>);
 
     return ([
       <Grid container key='kp-and-dicer-configurator-grid'>
@@ -185,30 +232,13 @@ class RoleConfigurator extends React.Component {
       </Grid>,
       <Grid container key='name-and-color-configurator-grid'>
         <Grid item xs align='center'>
-          <List>
-            {Object.keys(this.state.roleTable.table).map((roleID) => {
-              return (
-                <ListItem key={roleID} dense disableGutters={true} style={{justifyContent: 'center'}}>
-                  <TextField
-                    id={"text-field-role" + roleID}
-                    color="secondary"
-                    size="small"
-                    key={'text-' + roleID}
-                    InputProps={{
-                      style: {color: this.state.roleTable.getColor(roleID)}
-                    }}
-                    value={this.state.roleTable.getName(roleID)}
-                    onChange={(event) => {
-                      this.handleRoleNameChange(roleID, event.target.value);
-                    }}
-                  />
-                  <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}}>
-                    <ColorPicker id={roleID}
-                                 color={this.state.roleTable.getColor(roleID)}
-                                 onChangeComplete={(color) => {this.handleColorChange(roleID, color.hex)}}/>
-                  </ListItemIcon>
-                </ListItem>);
-            })}
+          <List dense>
+            {kpTable.length !== 0 && <ListSubheader key="kp" disableSticky>KP</ListSubheader>}
+            {kpTable.map((roleID) => generateListItem(roleID))}
+            {dicerTable.length !== 0 && <ListSubheader key="dicer" disableSticky>Dicer</ListSubheader>}
+            {dicerTable.map((roleID) => generateListItem(roleID))}
+            {pcTable.length !== 0 && <ListSubheader key="pc" disableSticky>PC</ListSubheader>}
+            {pcTable.map((roleID) => generateListItem(roleID))}
           </List>
         </Grid>
       </Grid>,

@@ -19,10 +19,43 @@ class LogRender extends React.Component {
   render() {
     const classes = this.props.classes;
 
+    const CustomTreeItem = withStyles({
+      root: {
+        // "&.MuiTreeItem-root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label:hover": {
+        //   background: 'transparent'
+        // },
+        // "&.MuiTreeItem-root.Mui-selected:focus > .MuiTreeItem-content .MuiTreeItem-label": {
+        //   background: 'transparent'
+        // },
+        "&.MuiTreeItem-root:focus > .MuiTreeItem-content .MuiTreeItem-label": {
+          background: 'transparent'
+        },
+        "&.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label": {
+          background: 'transparent'
+        },
+        "&.MuiTreeItem-root > .MuiTreeItem-content:hover": {
+          background: 'transparent'
+        },
+        "&.MuiTreeItem-root > .MuiTreeItem-content:hover > .MuiTreeItem-label": {
+          background: 'transparent'
+        }
+      },
+      group: {
+        marginLeft: 7,
+        paddingLeft: 18,
+        borderLeft: `1px dashed #33333333`,
+      },
+    })(TreeItem);
+
     const renderTree = (node) => {
       if (node.type !== Block) {
-        return <Typography key={node.id}
-                           style={{color: this.props.roleTable.getColor(node.role)}}>{`<${this.props.roleTable.getName(node.role)}> ${node.content}`}</Typography>;
+        let labelContent = <Typography key={node.id}
+                                       style={{color: this.props.roleTable.getColor(node.role)}}>
+          {`<${this.props.roleTable.getName(node.role)}> ${node.content}`}
+        </Typography>
+        return <CustomTreeItem key={node.id}
+                               nodeId={node.id.toString()}
+                               label={labelContent}/>
       } else {
         if (Array.isArray(node.children)) {
           if (node.collapsed) {
@@ -34,11 +67,11 @@ class LogRender extends React.Component {
               }
             }).filter((roleName) => roleName);
             let labelContent = <Typography
-              style={{color: '#a2a2a2'}}>{`---Click to Expand--- [${roleList.join(', ')}]`}</Typography>;
+              style={{color: '#a2a2a2'}}>{`{${roleList.join(', ')}}`}</Typography>;
             return (
-              <TreeItem key={node.id} nodeId={node.id.toString()} label={labelContent}>
+              <CustomTreeItem key={node.id} nodeId={node.id.toString()} label={labelContent}>
                 {node.children.map((node) => renderTree(node))}
-              </TreeItem>
+              </CustomTreeItem>
             );
           } else {
             return node.children.map((node) => renderTree(node));
@@ -56,6 +89,7 @@ class LogRender extends React.Component {
           defaultCollapseIcon={<ExpandMore/>}
           defaultExpanded={['root']}
           defaultExpandIcon={<ChevronRight/>}
+          disableSelection
         >
           {renderTree(this.props.node)}
         </TreeView>

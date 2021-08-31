@@ -8,7 +8,7 @@ const theme = createTheme({
         body: {
           height: '100%',
           width: '100%',
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+          fontFamily: "-apple-system, 'Helvetica Neue', Helvetica ,Arial, 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif",
           '-webkit-font-smoothing': 'antialiased',
           '-moz-osx-font-smoothing': 'grayscale',
         },
@@ -17,7 +17,8 @@ const theme = createTheme({
         },
         header: {
           textAlign: 'center',
-          marginBottom: '2em',
+          marginTop: '3em',
+          marginBottom: '3em'
         }
       }
     },
@@ -32,7 +33,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md">
+      <Container maxWidth="md" style={{marginBottom: '80px'}}>
         <header>
           <h1>
             es-logger

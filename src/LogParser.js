@@ -331,7 +331,7 @@ class LogParser extends React.Component {
           <input
             hidden
             id="contained-button-file"
-            multiple
+            accept="text/plain,.log"
             type="file"
             onChange={this.handleFileChange}
           />
@@ -360,7 +360,8 @@ class LogParser extends React.Component {
       </Grid>,
       <Grid container key='role-configurator-grid'>
         {this.state.roleTable &&
-        <RoleConfigurator roleTable={this.state.roleTable}
+        <RoleConfigurator key='role-configurator'
+                          roleTable={_.cloneDeep(this.state.roleTable)}
                           onSubmit={this.handleRoleTableChange}/>
         }
       </Grid>,
@@ -370,7 +371,6 @@ class LogParser extends React.Component {
         <LogFilter key='filter'
                    logFilter={this.state.logFilter}
                    roleTable={this.state.roleTable}
-                   onChange={this.handleCheckboxChange}
                    onSubmit={this.filterNodeByRole}/>
         }
       </Grid>,

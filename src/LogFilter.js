@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Checkbox, Grid} from "@material-ui/core";
+import {Button, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 import {Description} from "@material-ui/icons";
 
 class LogFilter extends React.Component {
@@ -14,10 +14,9 @@ class LogFilter extends React.Component {
     this.handleCommentChange = this.handleCommentChange.bind(this);
   }
 
-  handleRoleChange(event) {
-    let role = event.target.value;
+  handleRoleChange(roleID) {
     let tempLogFilter = this.state.logFilter;
-    tempLogFilter.role[role] = !tempLogFilter.role[role];
+    tempLogFilter.role[roleID] = !tempLogFilter.role[roleID];
     this.setState({logFilter: tempLogFilter});
   }
 
@@ -39,40 +38,51 @@ class LogFilter extends React.Component {
       for (let role in this.state.logFilter.role) {
         if (this.props.roleTable.getType(role) === 'pc') {
           filterElement.push(
-            <label id={'label-role-' + role} key={'checkbox-role-' + role}>
-              <Checkbox id={'checkbox-role-' + role}
-                        checked={this.state.logFilter.role[role]}
-                        onChange={this.handleRoleChange}
-                        value={role}/>
-              {this.props.roleTable.getName(role)}
-            </label>,
+            <ListItem key={role} button onClick={() => this.handleRoleChange(role)}>
+              <ListItemIcon>
+                <Checkbox
+                  edge="start"
+                  checked={this.state.logFilter.role[role]}
+                />
+              </ListItemIcon>
+              <ListItemText id={'label-role-' + role} primary={this.props.roleTable.getName(role)} />
+            </ListItem>
           );
         }
       }
-      filterElement.push(<br key='br-role'/>);
+      filterElement.push(<Divider/>);
       filterElement.push(
-        <label id="command" key="command">
-          <Checkbox id={'checkbox-command'}
-                 checked={this.state.logFilter.command}
-                 onChange={this.handleCommandChange} value={this.state.command}/>
-          Command
-        </label>);
+        <ListItem key='command' button onClick={this.handleCommandChange}>
+          <ListItemIcon>
+            <Checkbox
+              edge="start"
+              checked={this.state.logFilter.command}
+            />
+          </ListItemIcon>
+          <ListItemText id={'label-command'} primary='Command'/>
+        </ListItem>);
       filterElement.push(
-        <label id="comment" key="comment">
-          <Checkbox id={'checkbox-comment'}
-                 checked={this.state.logFilter.comment}
-                 onChange={this.handleCommentChange} value={this.state.command}/>
-          Comment
-        </label>,
-      );
+        <ListItem key='comment' button onClick={this.handleCommentChange}>
+          <ListItemIcon>
+            <Checkbox
+              edge="start"
+              checked={this.state.logFilter.comment}
+            />
+          </ListItemIcon>
+          <ListItemText id={'label-comment'} primary='Comment'/>
+        </ListItem>);
     }
     if (filterElement.length !== 0) {
       return (
-        <Grid container style={{marginBottom: '1em'}}>
-          <Grid item sm>
-            {filterElement}
+        <Grid container direction="column"
+              justifyContent="center" alignItems="center"
+              style={{marginBottom: '3em'}}>
+          <Grid item sm align='center'>
+            <List dense disablePadding>
+              {filterElement}
+            </List>
           </Grid>
-          <Grid item xs align='center'>
+          <Grid item sm align='center'>
             <Button
               variant="contained"
               color="secondary"
