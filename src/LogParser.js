@@ -55,6 +55,9 @@ class LogParser extends React.Component {
       filteredTreeRoot: null,
       roleTable: null,
       logFilter: {},   // e.g.: {"role": {0: true, 1: false, ...}], "command": true, "comment": true}
+      showRoleConfigurator: false,
+      showLogFilter: false,
+      showLogRender: false,
     };
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
@@ -244,6 +247,7 @@ class LogParser extends React.Component {
       parseTreeRoot: parseTree,
       syntaxTreeRoot: syntaxTree,
       roleTable: logScanner.roleTable,
+      showRoleConfigurator: true,
     });
     this.updateRole(this.state.syntaxTreeRoot);
     this.initializeLogFilter();
@@ -260,7 +264,7 @@ class LogParser extends React.Component {
   }
 
   handleRoleTableChange(newRoleTable) {
-    this.setState({roleTable: newRoleTable});
+    this.setState({roleTable: newRoleTable, showLogFilter: true});
   }
 
   // post-order traversal to delete nodes add update collapse states according to role filter checkboxes
@@ -319,7 +323,7 @@ class LogParser extends React.Component {
     };
     traverseFilter(filteredTree, null);
     this.updateRole(filteredTree);
-    this.setState({filteredTreeRoot: filteredTree});
+    this.setState({filteredTreeRoot: filteredTree, showLogRender: true});
   }
 
   render() {
@@ -359,7 +363,7 @@ class LogParser extends React.Component {
         </Grid>}
       </Grid>,
       <Grid container key='role-configurator-grid'>
-        {this.state.roleTable &&
+        {this.state.showRoleConfigurator &&
         <RoleConfigurator key='role-configurator'
                           roleTable={_.cloneDeep(this.state.roleTable)}
                           onSubmit={this.handleRoleTableChange}/>
@@ -367,7 +371,7 @@ class LogParser extends React.Component {
       </Grid>,
       <hr hidden={!this.state.roleTable} key='hr'/>,
       <Grid container key='role-filter-grid'>
-        {this.state.logFilter.hasOwnProperty('role') &&
+        {this.state.showLogFilter &&
         <LogFilter key='filter'
                    logFilter={this.state.logFilter}
                    roleTable={this.state.roleTable}
@@ -375,7 +379,7 @@ class LogParser extends React.Component {
         }
       </Grid>,
       <Container key='log-render-container' maxWidth="md">
-        {Object.keys(this.state.logFilter).length > 0 &&
+        {this.state.showLogRender &&
         <LogRender key='render'
                    node={this.state.filteredTreeRoot}
                    roleTable={this.state.roleTable}/>}
