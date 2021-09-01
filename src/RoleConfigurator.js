@@ -10,7 +10,7 @@ import {
   Chip,
   TextField,
   Button,
-  withStyles, List, ListItem, ListItemIcon, Grid, ListSubheader
+  withStyles, List, ListItem, ListItemIcon, Grid, ListSubheader, FormHelperText
 } from "@material-ui/core";
 import {Check} from "@material-ui/icons";
 import ColorPicker from "./ColorPicker";
@@ -163,6 +163,7 @@ class RoleConfigurator extends React.Component {
               labelId="kp-selection-checkbox-label"
               id="kp-selection-checkbox"
               multiple
+              error={this.state.kpList.length === 0}
               value={this.state.kpList}
               onChange={this.handleKpChange}
               input={<Input/>}
@@ -191,6 +192,7 @@ class RoleConfigurator extends React.Component {
                 }
               })}
             </Select>
+            <FormHelperText error hidden={this.state.kpList.length !== 0}>Must set at least one kp.</FormHelperText>
           </FormControl>
         </Grid>
         <Grid item xs align='left'>
@@ -200,6 +202,7 @@ class RoleConfigurator extends React.Component {
               labelId="dicer-selection-checkbox-label"
               id="dicer-selection-checkbox"
               multiple
+              error={this.state.dicerList.length === 0}
               value={this.state.dicerList}
               onChange={this.handleDicerChange}
               input={<Input/>}
@@ -228,6 +231,7 @@ class RoleConfigurator extends React.Component {
                 }
               })}
             </Select>
+            <FormHelperText error hidden={this.state.dicerList.length !== 0}>Must set at least one dicer.</FormHelperText>
           </FormControl>
         </Grid>
       </Grid>,
@@ -249,6 +253,7 @@ class RoleConfigurator extends React.Component {
             variant="contained"
             color="secondary"
             endIcon={<Check/>}
+            disabled={this.state.kpList.length === 0 || this.state.dicerList.length === 0}
             onClick={this.handleClick}>
             Apply
           </Button>
