@@ -225,8 +225,8 @@ class LogParser extends React.Component {
     this.state.syntaxTreeRoot.role.forEach((role) => roleDict[role] = true);
     let tempLogFilter = {
       'role': roleDict,
-      'command': true,
-      'comment': true,
+      'command': false,
+      'comment': false,
     };
     this.setState({logFilter: tempLogFilter});
   }
