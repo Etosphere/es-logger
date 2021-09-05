@@ -10,7 +10,15 @@ import {
   Chip,
   TextField,
   Button,
-  withStyles, List, ListItem, ListItemIcon, Grid, ListSubheader, FormHelperText
+  withStyles,
+  List,
+  ListItem,
+  ListItemIcon,
+  Grid,
+  ListSubheader,
+  FormHelperText,
+  Grow,
+  Fade
 } from "@material-ui/core";
 import {Check} from "@material-ui/icons";
 import ColorPicker from "./ColorPicker";
@@ -31,9 +39,9 @@ const styles = (theme) => ({
     marginRight: 2,
     marginBottom: 2,
     maxWidth: 100,
-    overflow: 'hidden',
+    overflow: "hidden",
     label: {
-      overflow: 'hidden',
+      overflow: "hidden",
     }
   },
   noLabel: {
@@ -131,126 +139,141 @@ class RoleConfigurator extends React.Component {
       .filter((roleID) => this.state.roleTable.getType(roleID) === 'pc');
 
     const generateListItem = (roleID) => (
-      <ListItem key={roleID} dense disableGutters={true} style={{justifyContent: 'center'}}>
-        <TextField
-          id={"text-field-role" + roleID}
-          color="secondary"
-          size="small"
-          key={'text-' + roleID}
-          InputProps={{
-            style: {color: this.state.roleTable.getColor(roleID)}
-          }}
-          value={this.state.roleTable.getName(roleID)}
-          onChange={(event) => {
-            this.handleRoleNameChange(roleID, event.target.value);
-          }}
-        />
-        <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}}>
-          <ColorPicker id={roleID}
-                       color={this.state.roleTable.getColor(roleID)}
-                       onChangeComplete={(color) => {
-                         this.handleColorChange(roleID, color.hex)
-                       }}/>
-        </ListItemIcon>
-      </ListItem>);
+      <Grow key={roleID} in timeout={1500} mountOnEnter unmountOnExit>
+        <ListItem key={roleID} dense disableGutters={true} style={{justifyContent: "center"}}>
+          <TextField
+            id={"text-field-role" + roleID}
+            color="secondary"
+            size="small"
+            key={'text-' + roleID}
+            InputProps={{
+              style: {color: this.state.roleTable.getColor(roleID)}
+            }}
+            value={this.state.roleTable.getName(roleID)}
+            onChange={(event) => {
+              this.handleRoleNameChange(roleID, event.target.value);
+            }}
+          />
+          <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}} edge="end">
+            <ColorPicker id={roleID}
+                         color={this.state.roleTable.getColor(roleID)}
+                         onChangeComplete={(color) => {
+                           this.handleColorChange(roleID, color.hex)
+                         }}/>
+          </ListItemIcon>
+        </ListItem>
+      </Grow>);
 
     return ([
-      <Grid container key='kp-and-dicer-configurator-grid'>
-        <Grid item xs align='right'>
-          <FormControl className={classes.formControl}>
-            <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
-            <Select
-              labelId="kp-selection-checkbox-label"
-              id="kp-selection-checkbox"
-              multiple
-              error={this.state.kpList.length === 0}
-              value={this.state.kpList}
-              onChange={this.handleKpChange}
-              input={<Input/>}
-              renderValue={(selected) => (
-                <div className={classes.chips}>
-                  {selected.map((value) => (
-                    <Chip key={value}
-                          label={this.state.roleTable.getName(value)}
-                          className={classes.chip}
-                          size="small"/>
-                  ))}
-                </div>
-              )}
-              MenuProps={MenuProps}
-            >
-              {Object.keys(this.state.roleTable.table).map((roleID) => {
-                if (!this.state.dicerList.includes(roleID)) {
-                  return (
-                    <MenuItem key={roleID} value={roleID}>
-                      <Checkbox checked={this.state.kpList.includes(roleID)}/>
-                      <ListItemText primary={this.state.roleTable.getName(roleID)}/>
-                    </MenuItem>
-                  )
-                } else {
-                  return null;
-                }
-              })}
-            </Select>
-            <FormHelperText error hidden={this.state.kpList.length !== 0}>Must set at least one kp.</FormHelperText>
-          </FormControl>
+      <Grid container key="kp-and-dicer-configurator-grid">
+        <Grid item xs align="right">
+          <Fade in timeout={1500}>
+            <FormControl className={classes.formControl}>
+              <InputLabel id="kp-selection-checkbox-label">Select KP</InputLabel>
+              <Select
+                labelId="kp-selection-checkbox-label"
+                id="kp-selection-checkbox"
+                multiple
+                error={this.state.kpList.length === 0}
+                value={this.state.kpList}
+                onChange={this.handleKpChange}
+                input={<Input/>}
+                renderValue={(selected) => (
+                  <div className={classes.chips}>
+                    {selected.map((value) => (
+                      <Chip key={value}
+                            label={this.state.roleTable.getName(value)}
+                            className={classes.chip}
+                            size="small"/>
+                    ))}
+                  </div>
+                )}
+                MenuProps={MenuProps}
+              >
+                {Object.keys(this.state.roleTable.table).map((roleID) => {
+                  if (!this.state.dicerList.includes(roleID)) {
+                    return (
+                      <MenuItem key={roleID} value={roleID}>
+                        <Checkbox checked={this.state.kpList.includes(roleID)}/>
+                        <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                      </MenuItem>
+                    )
+                  } else {
+                    return null;
+                  }
+                })}
+              </Select>
+              <FormHelperText error hidden={this.state.kpList.length !== 0}>Must set at least one kp.</FormHelperText>
+            </FormControl>
+          </Fade>
         </Grid>
-        <Grid item xs align='left'>
-          <FormControl className={classes.formControl}>
-            <InputLabel id="dicer-selection-checkbox-label">Select dicer</InputLabel>
-            <Select
-              labelId="dicer-selection-checkbox-label"
-              id="dicer-selection-checkbox"
-              multiple
-              error={this.state.dicerList.length === 0}
-              value={this.state.dicerList}
-              onChange={this.handleDicerChange}
-              input={<Input/>}
-              renderValue={(selected) => (
-                <div className={classes.chips}>
-                  {selected.map((value) => (
-                    <Chip key={value}
-                          label={this.state.roleTable.getName(value)}
-                          className={classes.chip}
-                          size="small"/>
-                  ))}
-                </div>
-              )}
-              MenuProps={MenuProps}
-            >
-              {Object.keys(this.state.roleTable.table).map((roleID) => {
-                if (!this.state.kpList.includes(roleID)) {
-                  return (
-                    <MenuItem key={roleID} value={roleID}>
-                      <Checkbox checked={this.state.dicerList.includes(roleID)}/>
-                      <ListItemText primary={this.state.roleTable.getName(roleID)}/>
-                    </MenuItem>
-                  );
-                } else {
-                  return null;
-                }
-              })}
-            </Select>
-            <FormHelperText error hidden={this.state.dicerList.length !== 0}>Must set at least one dicer.</FormHelperText>
-          </FormControl>
-        </Grid>
-      </Grid>,
-      <Grid container key='name-and-color-configurator-grid'>
-        <Grid item xs align='center'>
-          <List dense>
-            {kpTable.length !== 0 && <ListSubheader key="kp" disableSticky>KP</ListSubheader>}
-            {kpTable.map((roleID) => generateListItem(roleID))}
-            {dicerTable.length !== 0 && <ListSubheader key="dicer" disableSticky>Dicer</ListSubheader>}
-            {dicerTable.map((roleID) => generateListItem(roleID))}
-            {pcTable.length !== 0 && <ListSubheader key="pc" disableSticky>PC</ListSubheader>}
-            {pcTable.map((roleID) => generateListItem(roleID))}
-          </List>
+        <Grid item xs align="left">
+          <Fade in timeout={1500}>
+            <FormControl className={classes.formControl}>
+              <InputLabel id="dicer-selection-checkbox-label">Select dicer</InputLabel>
+              <Select
+                labelId="dicer-selection-checkbox-label"
+                id="dicer-selection-checkbox"
+                multiple
+                error={this.state.dicerList.length === 0}
+                value={this.state.dicerList}
+                onChange={this.handleDicerChange}
+                input={<Input/>}
+                renderValue={(selected) => (
+                  <div className={classes.chips}>
+                    {selected.map((value) => (
+                      <Chip key={value}
+                            label={this.state.roleTable.getName(value)}
+                            className={classes.chip}
+                            size="small"/>
+                    ))}
+                  </div>
+                )}
+                MenuProps={MenuProps}
+              >
+                {Object.keys(this.state.roleTable.table).map((roleID) => {
+                  if (!this.state.kpList.includes(roleID)) {
+                    return (
+                      <MenuItem key={roleID} value={roleID}>
+                        <Checkbox checked={this.state.dicerList.includes(roleID)}/>
+                        <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                      </MenuItem>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </Select>
+              <FormHelperText error hidden={this.state.dicerList.length !== 0}>Must set at least one
+                dicer.</FormHelperText>
+            </FormControl>
+          </Fade>
         </Grid>
       </Grid>,
-      <Grid container key='apply-button-grid' style={{marginBottom: '1em'}}>
-        <Grid item xs align='center'>
+      <Grid container key="name-and-color-configurator-grid">
+        <Grid item xs align="center">
+          <Fade in timeout={1500}>
+            <List dense>
+              {kpTable.length !== 0 &&
+              <Fade key="kp" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="kp"
+                                                                                         disableSticky>KP</ListSubheader></Fade>}
+              {kpTable.map((roleID) => generateListItem(roleID))}
+              {dicerTable.length !== 0 &&
+              <Fade key="dicer" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="dicer"
+                                                                                            disableSticky>Dicer</ListSubheader></Fade>}
+              {dicerTable.map((roleID) => generateListItem(roleID))}
+              {pcTable.length !== 0 &&
+              <Fade key="pc" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="pc"
+                                                                                         disableSticky>PC</ListSubheader></Fade>}
+              {pcTable.map((roleID) => generateListItem(roleID))}
+            </List>
+          </Fade>
+        </Grid>
+      </Grid>,
+      <Grid container key="apply-button-grid" style={{marginBottom: "1em"}}>
+        <Grid item xs align="center">
           <Button
-            variant="contained"
+            variant="outlined"
             color="secondary"
             endIcon={<Check/>}
             disabled={this.state.kpList.length === 0 || this.state.dicerList.length === 0}

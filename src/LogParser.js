@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {Button, Container, Grid} from '@material-ui/core';
+import {Button, Container, Fade, Grid} from '@material-ui/core';
 import {Publish, Send} from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import * as Token from './Token';
@@ -330,10 +330,10 @@ class LogParser extends React.Component {
 
   render() {
     return ([
-      <div id="back-to-top-anchor" key='back-to-top-anchor'/>,
-      <BackToTopButton key='back-to-top-button'/>,
-      <Grid key='handle-file-grid' container spacing={1} direction='column'>
-        <Grid item xs align='center'>
+      <div id="back-to-top-anchor" key="back-to-top-anchor"/>,
+      <BackToTopButton key="back-to-top-button"/>,
+      <Grid key="handle-file-grid" container spacing={1} direction="column" style={{marginBottom: 24}}>
+        <Grid item xs align="center">
           <input
             hidden
             id="contained-button-file"
@@ -343,8 +343,8 @@ class LogParser extends React.Component {
           />
           <label htmlFor="contained-button-file">
             <Button
-              variant="contained"
-              color="default"
+              variant="outlined"
+              color="primary"
               component="span"
               endIcon={<Publish/>}
             >
@@ -353,36 +353,40 @@ class LogParser extends React.Component {
           </label>
         </Grid>
         {this.state.selectedFile &&
-        <Grid item xs align='center'>
-          <Button
-            variant="contained"
-            color="primary"
-            component="span"
-            endIcon={<Send/>}
-            onClick={this.handleFileUpload}>
-            Submit
-          </Button>
-        </Grid>}
+        <Fade in timeout={1500}>
+          <Grid item xs align="center">
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              endIcon={<Send/>}
+              onClick={this.handleFileUpload}>
+              Submit
+            </Button>
+          </Grid>
+        </Fade>}
       </Grid>,
-      <Grid container key='role-configurator-grid'>
+      <Grid container key="role-configurator-grid">
+
         {this.state.showRoleConfigurator &&
-        <RoleConfigurator key='role-configurator'
+        <RoleConfigurator key="role-configurator"
                           roleTable={_.cloneDeep(this.state.roleTable)}
+                          logFilter={this.state.logFilter}
                           onSubmit={this.handleRoleTableChange}/>
         }
       </Grid>,
-      <hr hidden={!this.state.roleTable} key='hr'/>,
-      <Grid container key='role-filter-grid'>
+      <hr hidden={!this.state.roleTable} key="hr"/>,
+      <Grid container key="role-filter-grid">
         {this.state.showLogFilter &&
-        <LogFilter key='filter'
+        <LogFilter key="filter"
                    logFilter={this.state.logFilter}
                    roleTable={this.state.roleTable}
                    onSubmit={this.filterNodeByRole}/>
         }
       </Grid>,
-      <Container key='log-render-container' maxWidth="md">
+      <Container key="log-render-container" maxWidth="md">
         {this.state.showLogRender &&
-        <LogRender key='render'
+        <LogRender key="render"
                    node={this.state.filteredTreeRoot}
                    roleTable={this.state.roleTable}
                    header={this.header}/>}

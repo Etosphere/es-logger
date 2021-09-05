@@ -22,28 +22,28 @@ class LogRender extends React.Component {
     const CustomTreeItem = withStyles({
       root: {
         // "&.MuiTreeItem-root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label:hover": {
-        //   background: 'transparent'
+        //   background: "transparent"
         // },
         // "&.MuiTreeItem-root.Mui-selected:focus > .MuiTreeItem-content .MuiTreeItem-label": {
-        //   background: 'transparent'
+        //   background: "transparent"
         // },
         "&.MuiTreeItem-root:focus > .MuiTreeItem-content .MuiTreeItem-label": {
-          background: 'transparent'
+          background: "transparent"
         },
         "&.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label": {
-          background: 'transparent'
+          background: "transparent"
         },
         "&.MuiTreeItem-root > .MuiTreeItem-content:hover": {
-          background: 'transparent'
+          background: "transparent"
         },
         "&.MuiTreeItem-root > .MuiTreeItem-content:hover > .MuiTreeItem-label": {
-          background: 'transparent'
+          background: "transparent"
         }
       },
       group: {
         marginLeft: 7,
         paddingLeft: 18,
-        borderLeft: `1px dashed #33333333`,
+        borderLeft: "1px dashed #33333333",
       },
     })(TreeItem);
 
@@ -69,7 +69,7 @@ class LogRender extends React.Component {
               }
             }).filter((roleName) => roleName);
             let labelContent = <Typography
-              style={{color: '#a2a2a2'}}>{`{${roleList.join(', ')}}`}</Typography>;
+              style={{color: "#a2a2a2"}}>{`{${roleList.join(', ')}}`}</Typography>;
             return (
               <CustomTreeItem key={node.id} nodeId={node.id.toString()} label={labelContent}>
                 {node.children.map((node) => renderTree(node))}
@@ -94,7 +94,7 @@ class LogRender extends React.Component {
           defaultExpanded={['root']}
           defaultExpandIcon={<ChevronRight/>}
           disableSelection
-          style={{marginBottom: '48px'}}
+          style={{marginBottom: "48px"}}
         >
           {renderTree(this.props.node)}
         </TreeView>
