@@ -2,110 +2,159 @@
 
 A simple logger for CoC.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 ## Introduction
 
-The logger will parse the original log file, and convert into a json log. The json will be like this:
+The logger will render the input log into a collapsible outline. Format of the log file should be as follows:
 
-```{json}
-{
-  "id": 0,
-  "type": "block",
-  "role": ["kp", "dice", "plA", "plB"],
-  "content": [
-    {
-      "id": 1,
-      "type": "action",
-      "role": "plA",
-      "content": "Hello world!"
-    }, {
-      "id": 2,
-      "type": "block",
-      "role": ["kp", "dice", "plB"],
-      "content": [
-        {
-          "id": 3,
-          "type": "comment",
-          "role": "plB",
-          "content": "(some comment text"
-        }, {
-          "id": 4,
-          "type": "command",
-          "role": "plB",
-          "content": ".sc 1d3"
-        }, {
-          ...
-        }
-      ]
-    }
-  ]
-}
+```
+---
+title: "An Example Title"
+color:
+  kp: "#dc6a38"
+  dicer: "#2c3e50"
+  PC 1: "#782175"
+  PC 2: "#0c1403"
+  PC 3: "#4d4e4f"
+kp:
+  - "kp"
+dicer:
+  - "dicer"
+show_command: false
+show_comment: false
+---
+<{>
+<kp> The above line represents the beginning of a realm (actually is the global realm).
+<PC 2>write something...
+<PC 3> write something
+in two lines.
+<kp>write something too...
+<{>
+<kp>Now we are in a field that only me, PC 1 and PC 2 can see the text.
+<PC 1>
+<PC 2> So PC 3 won't see this line.
+<PC 2> The following line is comment line, starting with a round bracket.
+(Here is a comment line.)
+<kp> The following line is command line, starting with a dot.
+<kp> .rh
+<dicer>Show Command Result...
+<kp> The following line represents the end of a realm.
+<}>
+<kp> The following line represents the end of the global realm.
+<}>
 ```
 
-## Available Scripts
+The output collapsible outline will be like:
 
-In the project directory, you can run:
+- <kp> The above line represents the beginning of a realm (actually is the global realm).
+- <PC 2> write something...
+- <PC 3> write something in two lines.
+- <kp> write something too...
+- {PC 2, PC 1}
+  - <kp> Now we are in a field that only me, PC 1 and PC 2 can see the text.
+  - <PC 2> So PC 3 won't see this line.
+  - <PC 2> The following line is comment line, starting with a round bracket.
+  - <kp> The following line is command line, starting with a dot.
+  - <kp> The following line represents the end of a realm.
+- <kp> The following line represents the end of the global realm.
 
-### `npm start`
+## Log Syntax
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Overview
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The log file is a plain text file (the extension should be`.log`, `.txt`, or `.txt`), composed of three kinds of "commands": header, realm, and role behavior.
 
-### `npm test`
+### YAML header
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The YAML header initializes some configurations (some of them can be set in the web app). The header will **only** start on the first line of the log file.
 
-### `npm run build`
+To begin a YAML header, the **first line** of the log file should be `---`, which is the same way as starting a YAML document. Then you can start writing the YAML part. Following configurations are supported:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- `title`: set the title of rendered outline
+- `color`: set colors for each roles
+- `kp`: set one (or more) roles as keeper (kp)
+- `dicer`: set one (or more) roles as dice rolling bot
+- `show_command`: set whether to display the command content in the outline by default
+- `show_comment`: set whether to display the comment content in the outline by default
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+After finishing the YAML configuration, don't forget to add another `---` line to end the YAML header.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Here is an example:
 
-### `npm run eject`
+```{yaml}
+---
+title: "An Example Title"
+color:
+  kp: "#dc6a38"
+  dicer: "#2c3e50"
+  PC 1: "#782175"
+  PC 2: "#0c1403"
+  PC 3: "#4d4e4f"
+kp:
+  - "kp"
+dicer:
+  - "dicer"
+show_command: false
+show_comment: false
+---
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Realm
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+A realm determines the scope of the role's visibility of the text. A realm determines the scope of the character's visibility of the text.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+> If role "Alice" does not appear in the realm, then the text in this realm should not be seen in Alice's perspective.
+>
+> If only "Alice" and "Bob" are in the realm, then the realm should be **displayed** in the joint perspective of Alice and Bob, be **collapsed** in the perspective of one of Alice and Bob, and be **hidden** in the perspective of others.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+To make a realm, wrap the lines you want to set with `<{>` and `<}>`. Both `<{>` and `<}>` should be on new lines.
 
-## Learn More
+**Notice**: If you want to add a role in the realm, but no role behaviors, you can add an empty behavior line `<name>` in the realm.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Here is an example:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+<{>
+<kp>Now we are in a field that only me, PC 1 and PC 2 can see the text.
+<PC 1>
+<PC 2> So PC 3 won't see this line.
+<PC 2> The following line is comment line, starting with a round bracket.
+(Here is a comment line.)
+<kp> The following line is command line, starting with a dot.
+<kp> .rh
+<dicer>Show Command Result...
+<kp> The following line represents the end of a realm.
+<}>
+```
 
-### Code Splitting
+### Role behaviors (action / command / comment)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The role behavior is composed of role name and specific content. The syntax should be `<name> content`. The space between `<name>` and `content` is not necessary.
 
-### Analyzing the Bundle Size
+There are three types of role behaviors:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- `action`: starting with a character other than dot and round bracket (can take up multiple lines)
+- `command`: starting with a dot (`.`) (can only take up one line)
+- `comment`: starting with a round bracket (`(`, or `（` in Chinese) (can only take up one line)
 
-### Making a Progressive Web App
+If a line does not explicitly specify a role at the beginning of the line, the line will be considered a multiple-line action, or a single-line command/comment, depending on its first character.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Here is an example:
 
-### Advanced Configuration
+```
+<kp> Here is a single-line action.
+<PC 1> Here is a multiple-line action.
+Here is the second line.
+<PC 2> (Here is a comment, right bracket is not necessary.)
+<PC 3> .it's a command line
+<PC 4> Here is a multiple-line action, line 1.
+line 2.
+(Interrupt with a comment
+Here is a new multiple-line action, line 1.
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Special Thanks
 
-### Deployment
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The favicon is from illustrator [当然是金荆啦](https://space.bilibili.com/3255771/), image source is on [bilibili](https://t.bilibili.com/509792783880897356).
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

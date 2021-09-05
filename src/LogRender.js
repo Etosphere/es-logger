@@ -50,13 +50,10 @@ class LogRender extends React.Component {
     const renderTree = (node) => {
       if (node.type !== Block) {
         if (node.content) {
-          let labelContent = <Typography key={node.id}
-                                         style={{color: this.props.roleTable.getColor(node.role), whiteSpace: 'pre-line'}}>
+          return <Typography key={node.id}
+                             style={{color: this.props.roleTable.getColor(node.role), whiteSpace: 'pre-line'}}>
             {`<${this.props.roleTable.getName(node.role)}> ${node.content}`}
-          </Typography>
-          return <CustomTreeItem key={node.id}
-                                 nodeId={node.id.toString()}
-                                 label={labelContent}/>
+          </Typography>;
         }
       } else {
         if (Array.isArray(node.children)) {

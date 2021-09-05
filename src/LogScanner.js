@@ -105,7 +105,11 @@ class LogScanner {
           this.tokenSequence.push(
             new Token(tokenID, Command, roleID, line));
         } else {
-          bufferActionContent += '\n' + line;
+          if (bufferActionContent !== '') {
+            bufferActionContent += '\n' + line;
+          } else {
+            bufferActionContent += line;
+          }
           tokenID -= 1;
         }
       }
