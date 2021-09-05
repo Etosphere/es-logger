@@ -33,6 +33,11 @@ const theme = createTheme({
     Grid: {
       alignItems: "center",
       justifyContent: "center"
+    },
+    MuiDivider: {
+      root: {
+        margin: "12px"
+      }
     }
   },
   palette: {

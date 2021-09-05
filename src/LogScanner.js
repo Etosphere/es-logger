@@ -19,30 +19,40 @@ class LogScanner {
   constructor(rawLogData) {
     this.rawLogData = rawLogData;
     this.tokenSequence = [];
-    this.header = {};
+    // empty YAML header
+    this.header = {
+      title: null,
+      color: {},
+      kp: null,
+      dicer: null,
+      show_command: false,
+      show_comment: false,
+    };
     this.roleTable = new RoleTable();
   }
 
   analyze() {
-    let logArray = this.rawLogData.split('\n');
+    let rawLogLineArray = this.rawLogData.split('\n');
     let tokenID = 0;
     let lastRoleName = '';
     let bufferActionContent = '';
     let logStartLineNo = 0;  // the first line index after header
     // handle YAML header
-    if (logArray[0].trim() === '---') {
+    if (rawLogLineArray[0].trim() === '---') {
       let rawHeaderContent = '';
-      for (let i = 1; i < logArray.length; i++) {
-        if (logArray[i].trim() === '---') {
+      for (let i = 1; i < rawLogLineArray.length; i++) {
+        if (rawLogLineArray[i].trim() === '---') {
           logStartLineNo = i + 1;
           this.header = jsYaml.load(rawHeaderContent);
         } else {
-          rawHeaderContent += logArray[i] + '\n';
+          rawHeaderContent += rawLogLineArray[i] + '\n';
         }
       }
     }
-    logArray.slice(logStartLineNo).forEach((line, _) => {
-      line = line.trim();
+    let logLineArray = rawLogLineArray.slice(logStartLineNo)  // ignore header part
+      .map((line) => line.trim())    // remove whitespace on both sides of content
+      .filter((line) => line);       // remove empty line
+    logLineArray.forEach((line, _) => {
       let bracketContent = line.match(/<.+>/);  // <xxx>
       if (bracketContent) {
         if (lastRoleName !== '') {
@@ -109,13 +119,33 @@ class LogScanner {
     }
     this.tokenSequence.push(new Token(tokenID + 1, EOF, null, null));
 
-    // update role colors according to header
-    Object.entries(this.header.color).forEach(([roleName, color]) => {
-      let roleID = this.roleTable.getRoleIdByName(roleName);
-      if (roleID !== null) {
-        this.roleTable.setColor(roleID, color);
-      }
-    });
+    // update role colors according to YAML header
+    if (this.header.color) {
+      Object.entries(this.header.color).forEach(([roleName, color]) => {
+        let roleID = this.roleTable.getRoleIdByName(roleName);
+        if (roleID !== null) {
+          this.roleTable.setColor(roleID, color);
+        }
+      });
+    }
+    // set KP according to YAML header
+    if (this.header.kp) {
+      this.header.kp.forEach((roleName) => {
+        let roleID = this.roleTable.getRoleIdByName(roleName);
+        if (roleID !== null) {
+          this.roleTable.setType(roleID, 'kp');
+        }
+      });
+    }
+    // set dicer according to YAML header
+    if (this.header.dicer) {
+      this.header.dicer.forEach((roleName) => {
+        let roleID = this.roleTable.getRoleIdByName(roleName);
+        if (roleID !== null) {
+          this.roleTable.setType(roleID, 'dicer');
+        }
+      });
+    }
 
     return this.tokenSequence;
   }

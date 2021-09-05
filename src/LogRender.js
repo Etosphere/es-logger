@@ -86,7 +86,7 @@ class LogRender extends React.Component {
 
     if (this.props.node) {
       return ([
-        <h1 key="title">{this.props.header.title}</h1>,
+        this.props.header.title && <h1 key="title">{this.props.header.title}</h1>,
         <TreeView
           className={classes.root}
           key="render-tree"

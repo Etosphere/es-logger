@@ -18,11 +18,11 @@ import {
   ListSubheader,
   FormHelperText,
   Grow,
-  Fade
+  Fade,
+  Divider
 } from "@material-ui/core";
-import {Check} from "@material-ui/icons";
+import {Description} from "@material-ui/icons";
 import ColorPicker from "./ColorPicker";
-import _ from "lodash";
 
 const styles = (theme) => ({
   formControl: {
@@ -54,7 +54,7 @@ const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      maxHeight: ITEM_HEIGHT * 5.5 + ITEM_PADDING_TOP,
       width: 250
     }
   }
@@ -63,21 +63,33 @@ const MenuProps = {
 class RoleConfigurator extends React.Component {
   constructor(props) {
     super(props);
+
+    // initialize kpList and dicerList according to YAML header
+    let tempKpList = [];
+    let tempDicerList = [];
+    Object.values(this.props.roleTable.table).forEach((role) => {
+      if (role.type === 'kp') {
+        tempKpList.push(role.id);
+      } else if (role.type === 'dicer') {
+        tempDicerList.push(role.id);
+      }
+    });
     this.state = {
-      kpList: [],
-      dicerList: [],
-      roleTable: this.props.roleTable,
+      kpList: tempKpList,
+      dicerList: tempDicerList,
     }
 
     this.handleKpChange = this.handleKpChange.bind(this);
     this.handleDicerChange = this.handleDicerChange.bind(this);
     this.handleRoleNameChange = this.handleRoleNameChange.bind(this);
     this.handleColorChange = this.handleColorChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleRoleFilterChange = this.handleRoleFilterChange.bind(this);
+    this.handleCommandFilterChange = this.handleCommandFilterChange.bind(this);
+    this.handleCommentFilterChange = this.handleCommentFilterChange.bind(this);
   }
 
   handleKpChange(event) {
-    let tempRoleTable = this.state.roleTable;
+    let tempRoleTable = this.props.roleTable;
     let newKpList = event.target.value;
     Object.keys(tempRoleTable.table).forEach((roleID) => {
       tempRoleTable.setType(roleID, 'pc');
@@ -89,13 +101,14 @@ class RoleConfigurator extends React.Component {
       tempRoleTable.setType(role, 'dicer');
     });
     this.setState({
-      kpList: newKpList,
-      roleTable: tempRoleTable
+      kpList: newKpList
+    }, () => {
+      this.props.onRoleTableChange(tempRoleTable);
     });
   }
 
   handleDicerChange(event) {
-    let tempRoleTable = this.state.roleTable;
+    let tempRoleTable = this.props.roleTable;
     let newDicerList = event.target.value;
     Object.keys(tempRoleTable.table).forEach((roleID) => {
       tempRoleTable.setType(roleID, 'pc');
@@ -107,56 +120,80 @@ class RoleConfigurator extends React.Component {
       tempRoleTable.setType(role, 'dicer');
     });
     this.setState({
-      dicerList: newDicerList,
-      roleTable: tempRoleTable
+      dicerList: newDicerList
+    }, () => {
+      this.props.onRoleTableChange(tempRoleTable);
     });
   }
 
   handleRoleNameChange(roleID, newRoleName) {
-    let tempRoleTable = this.state.roleTable;
+    let tempRoleTable = this.props.roleTable;
     tempRoleTable.setName(roleID, newRoleName);
-    this.setState({roleTable: tempRoleTable});
+    this.props.onRoleTableChange(tempRoleTable);
   }
 
   handleColorChange(roleID, newRoleColor) {
-    let tempRoleTable = this.state.roleTable;
+    let tempRoleTable = this.props.roleTable;
     tempRoleTable.setColor(roleID, newRoleColor);
-    this.setState({roleTable: tempRoleTable});
+    this.props.onRoleTableChange(tempRoleTable);
   }
 
-  handleClick() {
-    this.props.onSubmit(_.cloneDeep(this.state.roleTable));
+  handleRoleFilterChange(roleID) {
+    let tempLogFilter = this.props.logFilter;
+    tempLogFilter.role[roleID] = !tempLogFilter.role[roleID];
+    this.props.onFilterChange(tempLogFilter);
+  }
+
+  handleCommandFilterChange() {
+    let tempLogFilter = this.props.logFilter;
+    tempLogFilter.command = !tempLogFilter.command;
+    this.props.onFilterChange(tempLogFilter);
+    this.setState({logFilter: tempLogFilter});
+  }
+
+  handleCommentFilterChange() {
+    let tempLogFilter = this.props.logFilter;
+    tempLogFilter.comment = !tempLogFilter.comment;
+    this.props.onFilterChange(tempLogFilter);
   }
 
   render() {
     const classes = this.props.classes;
 
-    const kpTable = Object.keys(this.state.roleTable.table)
-      .filter((roleID) => this.state.roleTable.getType(roleID) === 'kp');
-    const dicerTable = Object.keys(this.state.roleTable.table)
-      .filter((roleID) => this.state.roleTable.getType(roleID) === 'dicer');
-    const pcTable = Object.keys(this.state.roleTable.table)
-      .filter((roleID) => this.state.roleTable.getType(roleID) === 'pc');
+    const kpTable = Object.keys(this.props.roleTable.table)
+      .filter((roleID) => this.props.roleTable.getType(roleID) === 'kp');
+    const dicerTable = Object.keys(this.props.roleTable.table)
+      .filter((roleID) => this.props.roleTable.getType(roleID) === 'dicer');
+    const pcTable = Object.keys(this.props.roleTable.table)
+      .filter((roleID) => this.props.roleTable.getType(roleID) === 'pc');
 
     const generateListItem = (roleID) => (
       <Grow key={roleID} in timeout={1500} mountOnEnter unmountOnExit>
-        <ListItem key={roleID} dense disableGutters={true} style={{justifyContent: "center"}}>
+        <ListItem key={roleID} style={{justifyContent: "center"}}>
+          <ListItemIcon style={{minWidth: 0, paddingLeft: 9, paddingRight: 9}}>
+            <Checkbox
+              edge="start"
+              onClick={() => this.handleRoleFilterChange(roleID)}
+              checked={this.props.logFilter.role[roleID]}
+            />
+          </ListItemIcon>
           <TextField
             id={"text-field-role" + roleID}
             color="secondary"
-            size="small"
             key={'text-' + roleID}
             InputProps={{
-              style: {color: this.state.roleTable.getColor(roleID)}
+              style: {color: this.props.roleTable.getColor(roleID)}
             }}
-            value={this.state.roleTable.getName(roleID)}
+            fullWidth
+            error={!this.props.roleTable.getName(roleID)}
+            value={this.props.roleTable.getName(roleID)}
             onChange={(event) => {
               this.handleRoleNameChange(roleID, event.target.value);
             }}
           />
-          <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0}} edge="end">
+          <ListItemIcon key={'icon-' + roleID} style={{minWidth: 0, paddingLeft: 9, paddingRight: 9}}>
             <ColorPicker id={roleID}
-                         color={this.state.roleTable.getColor(roleID)}
+                         color={this.props.roleTable.getColor(roleID)}
                          onChangeComplete={(color) => {
                            this.handleColorChange(roleID, color.hex)
                          }}/>
@@ -182,7 +219,7 @@ class RoleConfigurator extends React.Component {
                   <div className={classes.chips}>
                     {selected.map((value) => (
                       <Chip key={value}
-                            label={this.state.roleTable.getName(value)}
+                            label={this.props.roleTable.getName(value)}
                             className={classes.chip}
                             size="small"/>
                     ))}
@@ -190,12 +227,12 @@ class RoleConfigurator extends React.Component {
                 )}
                 MenuProps={MenuProps}
               >
-                {Object.keys(this.state.roleTable.table).map((roleID) => {
+                {Object.keys(this.props.roleTable.table).map((roleID) => {
                   if (!this.state.dicerList.includes(roleID)) {
                     return (
                       <MenuItem key={roleID} value={roleID}>
                         <Checkbox checked={this.state.kpList.includes(roleID)}/>
-                        <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                        <ListItemText primary={this.props.roleTable.getName(roleID)}/>
                       </MenuItem>
                     )
                   } else {
@@ -223,7 +260,7 @@ class RoleConfigurator extends React.Component {
                   <div className={classes.chips}>
                     {selected.map((value) => (
                       <Chip key={value}
-                            label={this.state.roleTable.getName(value)}
+                            label={this.props.roleTable.getName(value)}
                             className={classes.chip}
                             size="small"/>
                     ))}
@@ -231,12 +268,12 @@ class RoleConfigurator extends React.Component {
                 )}
                 MenuProps={MenuProps}
               >
-                {Object.keys(this.state.roleTable.table).map((roleID) => {
+                {Object.keys(this.props.roleTable.table).map((roleID) => {
                   if (!this.state.kpList.includes(roleID)) {
                     return (
                       <MenuItem key={roleID} value={roleID}>
                         <Checkbox checked={this.state.dicerList.includes(roleID)}/>
-                        <ListItemText primary={this.state.roleTable.getName(roleID)}/>
+                        <ListItemText primary={this.props.roleTable.getName(roleID)}/>
                       </MenuItem>
                     );
                   } else {
@@ -253,19 +290,53 @@ class RoleConfigurator extends React.Component {
       <Grid container key="name-and-color-configurator-grid">
         <Grid item xs align="center">
           <Fade in timeout={1500}>
-            <List dense>
+            <List dense style={{maxWidth: '360px'}}>
               {kpTable.length !== 0 &&
-              <Fade key="kp" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="kp"
-                                                                                         disableSticky>KP</ListSubheader></Fade>}
+              <Fade key="kp" in timeout={1500} mountOnEnter unmountOnExit>
+                <ListSubheader key="kp" disableSticky style={{lineHeight: '28px'}}>
+                  KP
+                </ListSubheader>
+              </Fade>}
               {kpTable.map((roleID) => generateListItem(roleID))}
               {dicerTable.length !== 0 &&
-              <Fade key="dicer" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="dicer"
-                                                                                            disableSticky>Dicer</ListSubheader></Fade>}
+              <Fade key="dicer" in timeout={1500} mountOnEnter unmountOnExit>
+                <ListSubheader key="dicer" disableSticky style={{lineHeight: '28px'}}>
+                  Dicer
+                </ListSubheader>
+              </Fade>}
               {dicerTable.map((roleID) => generateListItem(roleID))}
               {pcTable.length !== 0 &&
-              <Fade key="pc" in timeout={1500} mountOnEnter unmountOnExit><ListSubheader key="pc"
-                                                                                         disableSticky>PC</ListSubheader></Fade>}
+              <Fade key="pc" in timeout={1500} mountOnEnter unmountOnExit>
+                <ListSubheader key="pc" disableSticky style={{lineHeight: '28px'}}>
+                  PC
+                </ListSubheader>
+              </Fade>}
               {pcTable.map((roleID) => generateListItem(roleID))}
+              <Divider key="divider" variant="middle"/>
+              <Grow key="command-checkbox" in timeout={1500} mountOnEnter unmountOnExit>
+                <ListItem key='command' button onClick={this.handleCommandFilterChange}>
+                  <ListItemIcon key='command-icon'>
+                    <Checkbox
+                      key='command-checkbox'
+                      edge="start"
+                      checked={this.props.logFilter.command}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id='label-command' key='label-command' primary='Show Command'/>
+                </ListItem>
+              </Grow>
+              <Grow key="comment-checkbox" in timeout={1500} mountOnEnter unmountOnExit>
+                <ListItem key='comment' button onClick={this.handleCommentFilterChange}>
+                  <ListItemIcon key='comment-icon'>
+                    <Checkbox
+                      key='comment-checkbox'
+                      edge="start"
+                      checked={this.props.logFilter.comment}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id='label-comment' key='label-comment' primary='Show Comment'/>
+                </ListItem>
+              </Grow>
             </List>
           </Fade>
         </Grid>
@@ -273,12 +344,13 @@ class RoleConfigurator extends React.Component {
       <Grid container key="apply-button-grid" style={{marginBottom: "1em"}}>
         <Grid item xs align="center">
           <Button
-            variant="outlined"
+            key="render-button"
+            variant={this.state.kpList.length === 0 && this.state.dicerList.length === 0 ? "outlined" : "contained"}
             color="secondary"
-            endIcon={<Check/>}
             disabled={this.state.kpList.length === 0 || this.state.dicerList.length === 0}
-            onClick={this.handleClick}>
-            Apply
+            endIcon={<Description/>}
+            onClick={this.props.onSubmit}>
+            Render
           </Button>
         </Grid>
       </Grid>

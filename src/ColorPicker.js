@@ -22,7 +22,8 @@ class ColorPicker extends React.Component {
         {(popupState) => (
           <div>
             <IconButton
-              style={{color: this.state.color}}
+              style={{color: this.state.color, padding: 9}}
+              edge="end"
               aria-label="change color"
               component="span"
               {...bindTrigger(popupState)}>
@@ -37,8 +38,7 @@ class ColorPicker extends React.Component {
               transformOrigin={{
                 vertical: 'bottom',
                 horizontal: 'center',
-              }}
-            >
+              }}>
               <SketchPicker color={this.state.color}
                             onChange={this.handleChange}
                             onChangeComplete={this.props.onChangeComplete}/>

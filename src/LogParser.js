@@ -1,11 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
-import {Button, Container, Fade, Grid} from '@material-ui/core';
+import {Button, Container, Divider, Fade, Grid} from '@material-ui/core';
 import {Publish, Send} from '@material-ui/icons';
 import LogScanner from './LogScanner';
 import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
-import LogFilter from "./LogFilter";
 import LogRender from "./LogRender";
 import BackToTopButton from "./BackToTopButton";
 
@@ -48,7 +47,10 @@ class SyntaxTreeNode {
 class LogParser extends React.Component {
   constructor(props) {
     super(props);
-    this.header = {};
+    this.header = {
+      show_command: false,
+      show_comment: false
+    };
     this.state = {
       selectedFile: null,
       parseTreeRoot: null,
@@ -57,14 +59,14 @@ class LogParser extends React.Component {
       roleTable: null,
       logFilter: {},   // e.g.: {"role": {0: true, 1: false, ...}], "command": true, "comment": true}
       showRoleConfigurator: false,
-      showLogFilter: false,
+      // showLogFilter: false,
       showLogRender: false,
     };
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
-    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleRoleTableChange = this.handleRoleTableChange.bind(this);
+    this.handleLogFilterChange = this.handleLogFilterChange.bind(this);
     this.filterNodeByRole = this.filterNodeByRole.bind(this);
   }
 
@@ -224,12 +226,11 @@ class LogParser extends React.Component {
   initializeLogFilter() {
     let roleDict = {};
     this.state.syntaxTreeRoot.role.forEach((role) => roleDict[role] = true);
-    let tempLogFilter = {
+    return {
       'role': roleDict,
-      'command': false,
-      'comment': false,
+      'command': this.header.show_command, // according to show_command in YAML header, default value is false
+      'comment': this.header.show_comment, // according to show_comment in YAML header, default value is false
     };
-    this.setState({logFilter: tempLogFilter});
   }
 
   handleFileChange(event) {
@@ -249,10 +250,11 @@ class LogParser extends React.Component {
       parseTreeRoot: parseTree,
       syntaxTreeRoot: syntaxTree,
       roleTable: logScanner.roleTable,
-      showRoleConfigurator: true,
+    }, () => {
+      this.updateRole(this.state.syntaxTreeRoot);
+      let logFilter = this.initializeLogFilter();
+      this.setState({logFilter: logFilter, showRoleConfigurator: true});
     });
-    this.updateRole(this.state.syntaxTreeRoot);
-    this.initializeLogFilter();
   }
 
   handleFileUpload() {
@@ -261,12 +263,12 @@ class LogParser extends React.Component {
     fileReader.readAsText(this.state.selectedFile);
   }
 
-  handleCheckboxChange(newLogFilter) {
-    this.setState({logFilter: newLogFilter});
+  handleRoleTableChange(newRoleTable) {
+    this.setState({roleTable: newRoleTable});
   }
 
-  handleRoleTableChange(newRoleTable) {
-    this.setState({roleTable: newRoleTable, showLogFilter: true});
+  handleLogFilterChange(newLogFilter) {
+    this.setState({logFilter: newLogFilter});
   }
 
   // post-order traversal to delete nodes add update collapse states according to role filter checkboxes
@@ -367,23 +369,25 @@ class LogParser extends React.Component {
         </Fade>}
       </Grid>,
       <Grid container key="role-configurator-grid">
-
         {this.state.showRoleConfigurator &&
         <RoleConfigurator key="role-configurator"
                           roleTable={_.cloneDeep(this.state.roleTable)}
                           logFilter={this.state.logFilter}
-                          onSubmit={this.handleRoleTableChange}/>
+                          header={this.header}
+                          onRoleTableChange={this.handleRoleTableChange}
+                          onFilterChange={this.handleLogFilterChange}
+                          onSubmit={this.filterNodeByRole}/>
         }
       </Grid>,
-      <hr hidden={!this.state.roleTable} key="hr"/>,
-      <Grid container key="role-filter-grid">
-        {this.state.showLogFilter &&
-        <LogFilter key="filter"
-                   logFilter={this.state.logFilter}
-                   roleTable={this.state.roleTable}
-                   onSubmit={this.filterNodeByRole}/>
-        }
-      </Grid>,
+      <Divider hidden={!this.state.showLogRender} key="divider"/>,
+      // <Grid container key="role-filter-grid">
+      //   {this.state.showLogFilter &&
+      //   <LogFilter key="filter"
+      //              logFilter={this.state.logFilter}
+      //              roleTable={this.state.roleTable}
+      //              onSubmit={this.filterNodeByRole}/>
+      //   }
+      // </Grid>,
       <Container key="log-render-container" maxWidth="md">
         {this.state.showLogRender &&
         <LogRender key="render"
