@@ -48,6 +48,7 @@ class SyntaxTreeNode {
 class LogParser extends React.Component {
   constructor(props) {
     super(props);
+    this.header = {};
     this.state = {
       selectedFile: null,
       parseTreeRoot: null,
@@ -241,6 +242,7 @@ class LogParser extends React.Component {
     let content = event.target.result;
     let logScanner = new LogScanner(content);
     let tokenSequence = logScanner.analyze();
+    this.header = logScanner.header;
     let parseTree = this.parse(tokenSequence);
     let syntaxTree = this.buildSyntaxTree(parseTree);
     this.setState({
@@ -382,7 +384,8 @@ class LogParser extends React.Component {
         {this.state.showLogRender &&
         <LogRender key='render'
                    node={this.state.filteredTreeRoot}
-                   roleTable={this.state.roleTable}/>}
+                   roleTable={this.state.roleTable}
+                   header={this.header}/>}
       </Container>
     ]);
   }

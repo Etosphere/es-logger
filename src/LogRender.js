@@ -85,9 +85,11 @@ class LogRender extends React.Component {
     }
 
     if (this.props.node) {
-      return (
+      return ([
+        <h1 key="title">{this.props.header.title}</h1>,
         <TreeView
           className={classes.root}
+          key="render-tree"
           defaultCollapseIcon={<ExpandMore/>}
           defaultExpanded={['root']}
           defaultExpandIcon={<ChevronRight/>}
@@ -96,7 +98,7 @@ class LogRender extends React.Component {
         >
           {renderTree(this.props.node)}
         </TreeView>
-      );
+      ]);
     } else {
       return null;
     }

@@ -1,5 +1,6 @@
 import Token, {BlockBegin, BlockEnd, Action, Command, Comment, EOF} from './Token';
 import {RoleTable} from './Role';
+import jsYaml from "js-yaml";
 
 const getRandomHSLAColor = (minH, maxH, minS, maxS, minL, maxL, minA, maxA) => {
   const getRandomNumber = (low, high) => {
@@ -18,15 +19,30 @@ class LogScanner {
   constructor(rawLogData) {
     this.rawLogData = rawLogData;
     this.tokenSequence = [];
+    this.header = {};
     this.roleTable = new RoleTable();
   }
 
   analyze() {
-    let logArray = this.rawLogData.split('\n').map((str) => str.trim());
+    let logArray = this.rawLogData.split('\n');
     let tokenID = 0;
     let lastRoleName = '';
     let bufferActionContent = '';
-    logArray.forEach((line, _) => {
+    let logStartLineNo = 0;  // the first line index after header
+    // handle YAML header
+    if (logArray[0].trim() === '---') {
+      let rawHeaderContent = '';
+      for (let i = 1; i < logArray.length; i++) {
+        if (logArray[i].trim() === '---') {
+          logStartLineNo = i + 1;
+          this.header = jsYaml.load(rawHeaderContent);
+        } else {
+          rawHeaderContent += logArray[i] + '\n';
+        }
+      }
+    }
+    logArray.slice(logStartLineNo).forEach((line, _) => {
+      line = line.trim();
       let bracketContent = line.match(/<.+>/);  // <xxx>
       if (bracketContent) {
         if (lastRoleName !== '') {
@@ -92,6 +108,15 @@ class LogScanner {
       bufferActionContent = '';
     }
     this.tokenSequence.push(new Token(tokenID + 1, EOF, null, null));
+
+    // update role colors according to header
+    Object.entries(this.header.color).forEach(([roleName, color]) => {
+      let roleID = this.roleTable.getRoleIdByName(roleName);
+      if (roleID !== null) {
+        this.roleTable.setColor(roleID, color);
+      }
+    });
+
     return this.tokenSequence;
   }
 }
