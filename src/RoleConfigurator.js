@@ -69,9 +69,9 @@ class RoleConfigurator extends React.Component {
     let tempDicerList = [];
     Object.values(this.props.roleTable.table).forEach((role) => {
       if (role.type === 'kp') {
-        tempKpList.push(role.id);
+        tempKpList.push(role.id.toString());
       } else if (role.type === 'dicer') {
-        tempDicerList.push(role.id);
+        tempDicerList.push(role.id.toString());
       }
     });
     this.state = {
@@ -167,7 +167,7 @@ class RoleConfigurator extends React.Component {
     const pcTable = Object.keys(this.props.roleTable.table)
       .filter((roleID) => this.props.roleTable.getType(roleID) === 'pc');
 
-    const generateListItem = (roleID) => (
+    const generateListItem = (roleID, disabledCheckbox) => (
       <Grow key={roleID} in timeout={1500} mountOnEnter unmountOnExit>
         <ListItem key={roleID} style={{justifyContent: "center"}}>
           <ListItemIcon style={{minWidth: 0, paddingLeft: 9, paddingRight: 9}}>
@@ -175,6 +175,7 @@ class RoleConfigurator extends React.Component {
               edge="start"
               onClick={() => this.handleRoleFilterChange(roleID)}
               checked={this.props.logFilter.role[roleID]}
+              disabled={disabledCheckbox}
             />
           </ListItemIcon>
           <TextField
@@ -200,6 +201,8 @@ class RoleConfigurator extends React.Component {
           </ListItemIcon>
         </ListItem>
       </Grow>);
+
+    console.log(kpTable, this.props.roleTable);
 
     return ([
       <Grid container key="kp-and-dicer-configurator-grid">
@@ -229,6 +232,7 @@ class RoleConfigurator extends React.Component {
               >
                 {Object.keys(this.props.roleTable.table).map((roleID) => {
                   if (!this.state.dicerList.includes(roleID)) {
+                    console.log(roleID, this.state.kpList, this.state.kpList.includes(roleID));
                     return (
                       <MenuItem key={roleID} value={roleID}>
                         <Checkbox checked={this.state.kpList.includes(roleID)}/>
@@ -297,21 +301,21 @@ class RoleConfigurator extends React.Component {
                   KP
                 </ListSubheader>
               </Fade>}
-              {kpTable.map((roleID) => generateListItem(roleID))}
+              {kpTable.map((roleID) => generateListItem(roleID, true))}
               {dicerTable.length !== 0 &&
               <Fade key="dicer" in timeout={1500} mountOnEnter unmountOnExit>
                 <ListSubheader key="dicer" disableSticky style={{lineHeight: '28px'}}>
                   Dicer
                 </ListSubheader>
               </Fade>}
-              {dicerTable.map((roleID) => generateListItem(roleID))}
+              {dicerTable.map((roleID) => generateListItem(roleID, true))}
               {pcTable.length !== 0 &&
               <Fade key="pc" in timeout={1500} mountOnEnter unmountOnExit>
                 <ListSubheader key="pc" disableSticky style={{lineHeight: '28px'}}>
                   PC
                 </ListSubheader>
               </Fade>}
-              {pcTable.map((roleID) => generateListItem(roleID))}
+              {pcTable.map((roleID) => generateListItem(roleID, false))}
               <Divider key="divider" variant="middle"/>
               <Grow key="command-checkbox" in timeout={1500} mountOnEnter unmountOnExit>
                 <ListItem key='command' button onClick={this.handleCommandFilterChange}>
