@@ -35,6 +35,14 @@ const theme = createTheme({
       justifyContent: 'center'
     }
   },
+  palette: {
+    primary: {
+      main: "#717bd6",
+    },
+    secondary: {
+      main: "#e8618c",
+    },
+  },
 });
 
 function App() {
