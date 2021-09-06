@@ -41,7 +41,8 @@ class ColorPicker extends React.Component {
               }}>
               <SketchPicker color={this.state.color}
                             onChange={this.handleChange}
-                            onChangeComplete={this.props.onChangeComplete}/>
+                            onChangeComplete={this.props.onChangeComplete}
+                            disableAlpha/>
             </Popover>
           </div>
         )}
