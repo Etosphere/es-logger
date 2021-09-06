@@ -236,6 +236,13 @@ class LogParser extends React.Component {
   handleFileChange(event) {
     this.setState({
       selectedFile: event.target.files[0],
+      parseTreeRoot: null,
+      syntaxTreeRoot: null,
+      filteredTreeRoot: null,
+      roleTable: null,
+      logFilter: {},
+      showRoleConfigurator: false,
+      showLogRender: false,
     });
   }
 
