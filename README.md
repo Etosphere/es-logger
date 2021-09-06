@@ -9,6 +9,10 @@ The logger will render the input log into a collapsible outline. Format of the l
 ```
 ---
 title: "An Example Title"
+description: |
+  Here is the description.
+  Multiple lines are okay.
+  Be careful of the indent!
 color:
   kp: "#dc6a38"
   dicer: "#2c3e50"
@@ -70,6 +74,7 @@ The YAML header initializes some configurations (some of them can be set in the 
 To begin a YAML header, the **first line** of the log file should be `---`, which is the same way as starting a YAML document. Then you can start writing the YAML part. Following configurations are supported:
 
 - `title`: set the title of rendered outline
+- `description`: set the multiple-line description (will rendered below the title)
 - `color`: set colors for each roles
 - `kp`: set one (or more) roles as keeper (kp)
 - `dicer`: set one (or more) roles as dice rolling bot
@@ -83,6 +88,10 @@ Here is an example:
 ```{yaml}
 ---
 title: "An Example Title"
+description: |
+  Here is the description.
+  Multiple lines are okay.
+  Be careful of the indent!
 color:
   kp: "#dc6a38"
   dicer: "#2c3e50"

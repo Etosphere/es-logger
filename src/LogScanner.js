@@ -22,6 +22,7 @@ class LogScanner {
     // empty YAML header
     this.header = {
       title: null,
+      description: null,
       color: {},
       kp: null,
       dicer: null,

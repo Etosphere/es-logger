@@ -202,8 +202,6 @@ class RoleConfigurator extends React.Component {
         </ListItem>
       </Grow>);
 
-    console.log(kpTable, this.props.roleTable);
-
     return ([
       <Grid container key="kp-and-dicer-configurator-grid">
         <Grid item xs align="right">
@@ -232,7 +230,6 @@ class RoleConfigurator extends React.Component {
               >
                 {Object.keys(this.props.roleTable.table).map((roleID) => {
                   if (!this.state.dicerList.includes(roleID)) {
-                    console.log(roleID, this.state.kpList, this.state.kpList.includes(roleID));
                     return (
                       <MenuItem key={roleID} value={roleID}>
                         <Checkbox checked={this.state.kpList.includes(roleID)}/>

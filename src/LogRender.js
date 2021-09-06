@@ -1,8 +1,8 @@
 import React from "react";
 import {Block} from "./LogParser";
-import {Typography, withStyles} from "@material-ui/core";
+import {Button, ButtonGroup, Typography, withStyles} from "@material-ui/core";
 import {TreeItem, TreeView} from "@material-ui/lab";
-import {ChevronRight, ExpandMore} from "@material-ui/icons";
+import {ChevronRight, ExpandLess, ExpandMore} from "@material-ui/icons";
 
 const styles = (theme) => ({
   "@global": {
@@ -16,6 +16,45 @@ const styles = (theme) => ({
 });
 
 class LogRender extends React.Component {
+  constructor(props) {
+    super(props);
+    this.collapsibleNodeArray = [];
+    this.state = {
+      expanded: [],
+    }
+
+    this.handleToggle = this.handleToggle.bind(this);
+    this.collapseAll = this.collapseAll.bind(this);
+    this.expandAll = this.expandAll.bind(this);
+
+    this.initializeCollapsibleNodeArray();
+  }
+
+  initializeCollapsibleNodeArray() {
+    const iterateTree = (node) => {
+      if (node.type === Block && Array.isArray(node.children)) {
+        if (node.collapsed) {
+          this.collapsibleNodeArray.push(node.id.toString());
+        }
+        node.children.forEach((node) => iterateTree(node));
+      }
+    }
+    iterateTree(this.props.node);
+  }
+
+  handleToggle(event, nodeId) {
+    this.setState({expanded: nodeId});
+  }
+
+  collapseAll() {
+    this.setState({expanded: []});
+  }
+
+  expandAll() {
+    console.log(this.collapsibleNodeArray);
+    this.setState({expanded: this.collapsibleNodeArray});
+  }
+
   render() {
     const classes = this.props.classes;
 
@@ -51,7 +90,7 @@ class LogRender extends React.Component {
       if (node.type !== Block) {
         if (node.content) {
           return <Typography key={node.id}
-                             style={{color: this.props.roleTable.getColor(node.role), whiteSpace: 'pre-line'}}>
+                             style={{color: this.props.roleTable.getColor(node.role), whiteSpace: "pre-line"}}>
             {`<${this.props.roleTable.getName(node.role)}> ${node.content}`}
           </Typography>;
         }
@@ -70,6 +109,15 @@ class LogRender extends React.Component {
             return (
               <CustomTreeItem key={node.id} nodeId={node.id.toString()} label={labelContent}>
                 {node.children.map((node) => renderTree(node))}
+                <CustomTreeItem key={node.id.toString() + '-collapse'}
+                                nodeId={node.id.toString() + '-collapse'}
+                                label={<Typography style={{color: "#a2a2a2"}}>{'Click to Collapse'}</Typography>}
+                                endIcon={<ExpandLess/>}
+                                onLabelClick={(event) => {
+                                  let newExpanded = this.state.expanded;
+                                  newExpanded.splice(newExpanded.indexOf(node.id.toString()), 1);
+                                  this.handleToggle(event, newExpanded);
+                                }}/>
               </CustomTreeItem>
             );
           } else {
@@ -83,7 +131,22 @@ class LogRender extends React.Component {
 
     if (this.props.node) {
       return ([
-        this.props.header.title && <h1 key="title">{this.props.header.title}</h1>,
+        this.props.header.title &&
+        <Typography key="title" variant="h4" style={{marginTop: "16px", marginBottom: "16px"}}>
+          {this.props.header.title}
+        </Typography>,
+        this.props.header.description &&
+        <Typography key="description" variant="subtitle1" style={{
+          whiteSpace: "pre-line",
+          marginBottom: "16px",
+          paddingLeft: "2em",
+          paddingRight: "2em",
+          color: "#666666"
+        }}>{this.props.header.description}</Typography>,
+        <ButtonGroup key="button-group" variant="outlined" size="small" color="primary" style={{marginBottom: "16px"}}>
+          <Button onClick={this.expandAll}>Expand all</Button>
+          <Button onClick={this.collapseAll}>Collapse all</Button>
+        </ButtonGroup>,
         <TreeView
           className={classes.root}
           key="render-tree"
@@ -91,6 +154,8 @@ class LogRender extends React.Component {
           defaultExpanded={['root']}
           defaultExpandIcon={<ChevronRight/>}
           disableSelection
+          expanded={this.state.expanded}
+          onNodeToggle={this.handleToggle}
           style={{marginBottom: "48px"}}
         >
           {renderTree(this.props.node)}
@@ -99,39 +164,6 @@ class LogRender extends React.Component {
     } else {
       return null;
     }
-    // let children = null;
-    // if (this.props.node && this.props.node.children !== 0) {
-    //   children = (
-    //     <ul style={{listStyleType: 'none', margin: 0}}>
-    //       {this.props.node.children.map((i) => (
-    //         <LogRender node={i} key={'log-node-' + i.id} roleTable={this.props.roleTable}/>
-    //       ))}
-    //     </ul>
-    //   );
-    //   if (this.props.node.type === Block) {
-    //     let blockRoles = this.props.node.role.map((roleID) => this.props.roleTable.getName(roleID)).join(', ');
-    //     if (this.props.node.id === 0) {
-    //       // not render the root Block node
-    //       return (<div>{children}</div>);
-    //     } else {
-    //       return (
-    //         <li>
-    //           <span>[{blockRoles}]</span>
-    //           {children}
-    //         </li>
-    //       );
-    //     }
-    //   } else {
-    //     return (
-    //       <li>
-    //         <span>&lt;{this.props.roleTable.getName(this.props.node.role)}&gt;</span> {this.props.node.content}
-    //         {children}
-    //       </li>
-    //     );
-    //   }
-    // } else {
-    //   return null;
-    // }
   }
 }
 
