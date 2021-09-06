@@ -1,9 +1,9 @@
-export const BlockBegin = Symbol('block-begin');
-export const BlockEnd = Symbol('block-end');
-export const Action = Symbol('action');
-export const Command = Symbol('command');
-export const Comment = Symbol('comment');
-export const EOF = Symbol('eof');
+export const BlockBegin = 'block-begin';
+export const BlockEnd = 'block-end';
+export const Action = 'action';
+export const Command = 'command';
+export const Comment = 'comment';
+export const EOF = 'eof';
 
 export default class Token {
   constructor(id, tokenType, roleID, content) {

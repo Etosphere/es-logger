@@ -8,15 +8,15 @@ import RoleConfigurator from "./RoleConfigurator";
 import LogRender from "./LogRender";
 import BackToTopButton from "./BackToTopButton";
 
-export const Start = Symbol('Start');
-export const StartPrime = Symbol('Start\'');
-export const Block = Symbol('Block');
-export const BlockBegin = Symbol('block-begin');
-export const BlockEnd = Symbol('block-end');
-export const ACC = Symbol('ACC');
-export const Action = Symbol('action');
-export const Command = Symbol('command');
-export const Comment = Symbol('comment');
+export const Start = 'Start';
+export const StartPrime = "Start'";
+export const Block = 'Block';
+export const BlockBegin = 'block-begin';
+export const BlockEnd = 'block-end';
+export const ACC = 'ACC';
+export const Action = 'action';
+export const Command = 'command';
+export const Comment = 'comment';
 
 class ParseTreeNode {
   constructor(type, content) {
