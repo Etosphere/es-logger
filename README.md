@@ -133,7 +133,7 @@ The role behavior is composed of role name and specific content. The syntax shou
 There are three types of role behaviors:
 
 - `action`: starting with a character other than dot and round bracket (can take up multiple lines)
-- `command`: starting with a dot (`.`) (can only take up one line)
+- `command`: starting with a dot (`.`, or `。` in Chinese) (can only take up one line)
 - `comment`: starting with a round bracket (`(`, or `（` in Chinese) (can only take up one line)
 
 If a line does not explicitly specify a role at the beginning of the line, the line will be considered a multiple-line action, or a single-line command/comment, depending on its first character.

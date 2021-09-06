@@ -97,7 +97,7 @@ class LogScanner {
           }
           this.tokenSequence.push(
             new Token(tokenID, Comment, roleID, line));
-        } else if (line[0] === '.') {
+        } else if (line[0] === '.' || line[0] === '。') {
           if (bufferActionContent !== '') {
             this.tokenSequence.push(new Token(tokenID, Action, roleID, bufferActionContent));
             bufferActionContent = '';
