@@ -1,7 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-import {Button, Container, Divider, Fade, Grid} from '@material-ui/core';
-import {Publish, Send} from '@material-ui/icons';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
+import Fade from '@material-ui/core/Fade';
+import Grid from '@material-ui/core/Grid';
+import PublishIcon from '@material-ui/icons/Publish';
+import SendIcon from '@material-ui/icons/Send';
 import LogScanner from './LogScanner';
 import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
@@ -62,6 +67,7 @@ class LogParser extends React.Component {
       // showLogFilter: false,
       showLogRender: false,
     };
+
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleFileRead = this.handleFileRead.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
@@ -355,7 +361,7 @@ class LogParser extends React.Component {
               variant="outlined"
               color="primary"
               component="span"
-              endIcon={<Publish/>}
+              endIcon={<PublishIcon/>}
             >
               Browse
             </Button>
@@ -368,7 +374,7 @@ class LogParser extends React.Component {
               variant="contained"
               color="primary"
               component="span"
-              endIcon={<Send/>}
+              endIcon={<SendIcon/>}
               onClick={this.handleFileUpload}>
               Submit
             </Button>

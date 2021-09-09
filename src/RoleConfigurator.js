@@ -1,27 +1,25 @@
 import React from "react";
-import {
-  Input,
-  InputLabel,
-  MenuItem,
-  FormControl,
-  ListItemText,
-  Select,
-  Checkbox,
-  Chip,
-  TextField,
-  Button,
-  withStyles,
-  List,
-  ListItem,
-  ListItemIcon,
-  Grid,
-  ListSubheader,
-  FormHelperText,
-  Grow,
-  Fade,
-  Divider
-} from "@material-ui/core";
-import {Description} from "@material-ui/icons";
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import ListItemText from '@material-ui/core/ListItemText';
+import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
+import Chip from '@material-ui/core/Chip';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import withStyles from '@material-ui/core/styles/withStyles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Grid from '@material-ui/core/Grid';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Grow from '@material-ui/core/Grow';
+import Fade from '@material-ui/core/Fade';
+import Divider from '@material-ui/core/Divider';
+import DescriptionIcon from "@material-ui/icons/Description";
 import ColorPicker from "./ColorPicker";
 
 const styles = (theme) => ({
@@ -349,7 +347,7 @@ class RoleConfigurator extends React.Component {
             variant={this.state.kpList.length === 0 && this.state.dicerList.length === 0 ? "outlined" : "contained"}
             color="secondary"
             disabled={this.state.kpList.length === 0 || this.state.dicerList.length === 0}
-            endIcon={<Description/>}
+            endIcon={<DescriptionIcon/>}
             onClick={this.props.onSubmit}>
             Render
           </Button>

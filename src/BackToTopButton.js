@@ -1,6 +1,9 @@
 import React from "react";
-import {Fab, Zoom, useScrollTrigger, makeStyles} from "@material-ui/core";
-import {KeyboardArrowUp} from '@material-ui/icons'
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import Fab from "@material-ui/core/Fab";
+import Zoom from "@material-ui/core/Zoom";
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,7 +43,7 @@ export default function BackToTopButton(props) {
   return (
     <ScrollTop {...props}>
       <Fab color="secondary" size="small" aria-label="scroll back to top">
-        <KeyboardArrowUp />
+        <KeyboardArrowUpIcon/>
       </Fab>
     </ScrollTop>
   );

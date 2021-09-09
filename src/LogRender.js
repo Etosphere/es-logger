@@ -1,8 +1,14 @@
 import React from "react";
-import {Block} from "./LogParser";
-import {Button, ButtonGroup, Typography, withStyles} from "@material-ui/core";
-import {TreeItem, TreeView} from "@material-ui/lab";
-import {ChevronRight, ExpandLess, ExpandMore} from "@material-ui/icons";
+import {Block} from './LogParser';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Typography from '@material-ui/core/Typography';
+import withStyles from '@material-ui/core/styles/withStyles';
+import TreeItem from '@material-ui/lab/TreeItem';
+import TreeView from '@material-ui/lab/TreeView';
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const styles = (theme) => ({
   "@global": {
@@ -112,7 +118,7 @@ class LogRender extends React.Component {
                 <CustomTreeItem key={node.id.toString() + '-collapse'}
                                 nodeId={node.id.toString() + '-collapse'}
                                 label={<Typography style={{color: "#a2a2a2"}}>{'Click to Collapse'}</Typography>}
-                                endIcon={<ExpandLess/>}
+                                endIcon={<ExpandLessIcon/>}
                                 onLabelClick={(event) => {
                                   let newExpanded = this.state.expanded;
                                   newExpanded.splice(newExpanded.indexOf(node.id.toString()), 1);
@@ -141,7 +147,7 @@ class LogRender extends React.Component {
           marginBottom: "16px",
           paddingLeft: "2em",
           paddingRight: "2em",
-          color: "#666666"
+          color: "#888888"
         }}>{this.props.header.description}</Typography>,
         <ButtonGroup key="button-group" variant="outlined" size="small" color="primary" style={{marginBottom: "16px"}}>
           <Button onClick={this.expandAll}>Expand all</Button>
@@ -150,9 +156,9 @@ class LogRender extends React.Component {
         <TreeView
           className={classes.root}
           key="render-tree"
-          defaultCollapseIcon={<ExpandMore/>}
+          defaultCollapseIcon={<ExpandMoreIcon/>}
           defaultExpanded={['root']}
-          defaultExpandIcon={<ChevronRight/>}
+          defaultExpandIcon={<ChevronRightIcon/>}
           disableSelection
           expanded={this.state.expanded}
           onNodeToggle={this.handleToggle}

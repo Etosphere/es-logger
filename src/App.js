@@ -1,6 +1,13 @@
-import {createTheme, ThemeProvider, CssBaseline, Container, Link} from "@material-ui/core";
-import LogParser from './LogParser';
-import {GitHub} from '@material-ui/icons';
+import React, {Suspense} from 'react';
+import createTheme from "@material-ui/core/styles/createTheme";
+import {ThemeProvider} from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import Link from "@material-ui/core/Link";
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import GitHubIcon from '@material-ui/icons/GitHub';
+import TopAppBar from './TopAppBar';
 
 const theme = createTheme({
   overrides: {
@@ -16,11 +23,6 @@ const theme = createTheme({
         },
         code: {
           fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
-        },
-        header: {
-          textAlign: "center",
-          marginTop: "3em",
-          marginBottom: "3em"
         },
         footer: {
           padding: "1.5em",
@@ -50,24 +52,31 @@ const theme = createTheme({
   },
 });
 
+const LogParserComponent = React.lazy(() => import('./LogParser'));
+
+const LoadingComponent = () => (
+  <Backdrop open>
+    <CircularProgress color="inherit" />
+  </Backdrop>
+);
+
+const SuspenseComponent = () => (
+  <Suspense fallback={LoadingComponent}>
+    <Container maxWidth="md" style={{minHeight: "82vh", marginTop: '2em'}}>
+      <LogParserComponent/>
+    </Container>
+  </Suspense>
+)
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="md" style={{minHeight: "82vh"}}>
-        <header>
-          <h1>
-            es-logger
-          </h1>
-          <h3>
-            A simple logger for CoC.
-          </h3>
-        </header>
-        <LogParser />
-      </Container>
+      <CssBaseline/>
+      <TopAppBar/>
+      <SuspenseComponent/>
       <footer id="footer" className="footer">
         <Link href="https://github.com/etosphere/es-logger" style={{color: "#907da2"}}>
-          <GitHub fontSize="small"/>
+          <GitHubIcon fontSize="small"/>
         </Link>
         <div style={{color: "#907da2"}}>©&nbsp;2021&nbsp;ES</div>
       </footer>

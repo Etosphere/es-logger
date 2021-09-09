@@ -1,8 +1,9 @@
 import React from 'react';
-import {IconButton, Popover} from "@material-ui/core";
-import {FormatColorText} from "@material-ui/icons";
-import {SketchPicker} from "react-color";
+import IconButton from "@material-ui/core/IconButton";
+import Popover from "@material-ui/core/Popover";
+import FormatColorTextIcon from "@material-ui/icons/FormatColorText";
 import PopupState, {bindTrigger, bindPopover} from 'material-ui-popup-state';
+import SketchPicker from "react-color/lib/Sketch";
 
 class ColorPicker extends React.Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class ColorPicker extends React.Component {
               aria-label="change color"
               component="span"
               {...bindTrigger(popupState)}>
-              <FormatColorText/>
+              <FormatColorTextIcon/>
             </IconButton>
             <Popover
               {...bindPopover(popupState)}
