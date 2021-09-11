@@ -12,6 +12,7 @@ import * as Token from './Token';
 import RoleConfigurator from "./RoleConfigurator";
 import LogRender from "./LogRender";
 import BackToTopButton from "./BackToTopButton";
+import {addChildNode, ParseTreeNode, SyntaxTreeNode} from './TreeNode';
 
 export const Start = 'Start';
 export const StartPrime = "Start'";
@@ -22,32 +23,6 @@ export const ACC = 'ACC';
 export const Action = 'action';
 export const Command = 'command';
 export const Comment = 'comment';
-
-class ParseTreeNode {
-  constructor(type, content) {
-    this.type = type;
-    this.content = content;
-    this.children = [];
-  }
-
-  addChild = (node) => {
-    this.children.push(node);
-  };
-}
-
-class SyntaxTreeNode {
-  constructor(id, type, role, content) {
-    this.id = id;
-    this.type = type;
-    this.role = role;
-    this.content = content;
-    this.children = [];
-  }
-
-  addChild = (node) => {
-    this.children.push(node);
-  };
-}
 
 class LogParser extends React.Component {
   constructor(props) {
@@ -90,16 +65,16 @@ class LogParser extends React.Component {
     let parseProgram = (node) => {
       let token = getToken();
       if (token.type === Token.BlockBegin) {
-        node.addChild(new ParseTreeNode(Block, null));
+        addChildNode(node, new ParseTreeNode(Block, null));
         if (parseBlock(node.children[0])) {
-          node.addChild(new ParseTreeNode(StartPrime, null));
+          addChildNode(node, new ParseTreeNode(StartPrime, null));
           return parseStartPrime(node.children[1]);
         }
       } else if (token.type === Token.Action || token.type === Token.Command ||
         token.type === Token.Comment) {
-        node.addChild(new ParseTreeNode(ACC, null));
+        addChildNode(node, new ParseTreeNode(ACC, null));
         if (parseACC(node.children[0])) {
-          node.addChild(new ParseTreeNode(StartPrime, null));
+          addChildNode(node, new ParseTreeNode(StartPrime, null));
           return parseStartPrime(node.children[1]);
         }
       } else {
@@ -111,16 +86,16 @@ class LogParser extends React.Component {
     let parseStartPrime = (node) => {
       let token = getToken();
       if (token.type === Token.BlockBegin) {
-        node.addChild(new ParseTreeNode(Block, null));
+        addChildNode(node, new ParseTreeNode(Block, null));
         if (parseBlock(node.children[0])) {
-          node.addChild(new ParseTreeNode(StartPrime, null));
+          addChildNode(node, new ParseTreeNode(StartPrime, null));
           return parseStartPrime(node.children[1]);
         }
       } else if (token.type === Token.Action || token.type === Token.Command ||
         token.type === Token.Comment) {
-        node.addChild(new ParseTreeNode(ACC, null));
+        addChildNode(node, new ParseTreeNode(ACC, null));
         if (parseACC(node.children[0])) {
-          node.addChild(new ParseTreeNode(StartPrime, null));
+          addChildNode(node, new ParseTreeNode(StartPrime, null));
           return parseStartPrime(node.children[1]);
         }
       } else {
@@ -131,11 +106,11 @@ class LogParser extends React.Component {
     let parseBlock = (node) => {
       let token = getToken();
       if (token.type === Token.BlockBegin) {
-        node.addChild(new ParseTreeNode(BlockBegin, token));
+        addChildNode(node, new ParseTreeNode(BlockBegin, token));
         nextToken();
-        node.addChild(new ParseTreeNode(StartPrime, null));
+        addChildNode(node, new ParseTreeNode(StartPrime, null));
         if (parseStartPrime(node.children[1])) {
-          node.addChild(new ParseTreeNode(BlockEnd, getToken()));
+          addChildNode(node, new ParseTreeNode(BlockEnd, getToken()));
           if (getToken().type === Token.BlockEnd) {
             nextToken();
             return true;
@@ -152,15 +127,15 @@ class LogParser extends React.Component {
     let parseACC = (node) => {
       let token = getToken();
       if (token.type === Token.Action) {
-        node.addChild(new ParseTreeNode(Action, token));
+        addChildNode(node, new ParseTreeNode(Action, token));
         nextToken();
         return true;
       } else if (token.type === Token.Command) {
-        node.addChild(new ParseTreeNode(Command, token));
+        addChildNode(node, new ParseTreeNode(Command, token));
         nextToken();
         return true;
       } else if (token.type === Token.Comment) {
-        node.addChild(new ParseTreeNode(Comment, token));
+        addChildNode(node, new ParseTreeNode(Comment, token));
         nextToken();
         return true;
       } else {
@@ -182,10 +157,10 @@ class LogParser extends React.Component {
     let nodeID = 1;
     let buildSyntaxTreeNode = (originNode, buildRootNode) => {
       if (originNode.type === Block) {
-        buildRootNode.addChild(new SyntaxTreeNode(nodeID, Block, [], null));
+        addChildNode(buildRootNode, new SyntaxTreeNode(nodeID, Block, [], null));
       } else if (originNode.type === Action || originNode.type === Command ||
         originNode.type === Comment) {
-        buildRootNode.addChild(
+        addChildNode(buildRootNode,
           new SyntaxTreeNode(nodeID, originNode.type, originNode.content.roleID,
             originNode.content.content));
       } else {

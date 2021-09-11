@@ -61,7 +61,7 @@ const LoadingComponent = () => (
 );
 
 const SuspenseComponent = () => (
-  <Suspense fallback={LoadingComponent}>
+  <Suspense fallback={<LoadingComponent/>}>
     <Container maxWidth="md" style={{minHeight: "82vh", marginTop: '2em'}}>
       <LogParserComponent/>
     </Container>

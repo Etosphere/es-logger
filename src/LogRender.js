@@ -57,7 +57,6 @@ class LogRender extends React.Component {
   }
 
   expandAll() {
-    console.log(this.collapsibleNodeArray);
     this.setState({expanded: this.collapsibleNodeArray});
   }
 
