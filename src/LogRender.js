@@ -1,14 +1,16 @@
-import React from "react";
+import React from 'react';
 import {Block} from './LogParser';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import TreeItem from '@material-ui/lab/TreeItem';
 import TreeView from '@material-ui/lab/TreeView';
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveToDocxButton from './SaveToDocxButton';
 
 const styles = (theme) => ({
   "@global": {
@@ -148,10 +150,18 @@ class LogRender extends React.Component {
           paddingRight: "2em",
           color: "#888888"
         }}>{this.props.header.description}</Typography>,
-        <ButtonGroup key="button-group" variant="outlined" size="small" color="primary" style={{marginBottom: "16px"}}>
-          <Button onClick={this.expandAll}>Expand all</Button>
-          <Button onClick={this.collapseAll}>Collapse all</Button>
-        </ButtonGroup>,
+        <Grid key="buttons-grid" container spacing={2} style={{marginBottom: '12px'}}>
+          <Grid key="expand-and-collapse-button-group" item xs={12} sm={8}>
+            <ButtonGroup key="button-group" variant="outlined" size="small" color="primary">
+              <Button onClick={this.expandAll}>Expand all</Button>
+              <Button onClick={this.collapseAll}>Collapse all</Button>
+            </ButtonGroup>
+          </Grid>
+          <Grid key="save-to-docx-button" item xs={12} sm={4} align="right">
+            <SaveToDocxButton key="save-to-docx-button" data={this.props.node} roleTable={this.props.roleTable}
+                            header={this.props.header}/>
+          </Grid>
+        </Grid>,
         <TreeView
           className={classes.root}
           key="render-tree"
